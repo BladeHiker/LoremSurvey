@@ -6917,10 +6917,10 @@ qs@6.7.0:
   resolved "https://registry.npm.taobao.org/qs/download/qs-6.7.0.tgz?cache=0&sync_timestamp=1616385248556&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fqs%2Fdownload%2Fqs-6.7.0.tgz#41dc1a015e3d581f1621776be31afb2876a9b1bc"
   integrity sha1-QdwaAV49WB8WIXdr4xr7KHapsbw=
 
-quasar@^1.0.0:
-  version "1.15.13"
-  resolved "https://registry.nlark.com/quasar/download/quasar-1.15.13.tgz#04ca97bcdcd6fc8117e306216bf85af7233116f9"
-  integrity sha1-BMqXvNzW/IEX4wYha/ha9yMxFvk=
+quasar@1.15.5:
+  version "1.15.5"
+  resolved "https://registry.nlark.com/quasar/download/quasar-1.15.5.tgz#61b68de4d4cde41c3835d1daa2e5127514b4b331"
+  integrity sha1-YbaN5NTN5Bw4NdHaouUSdRS0szE=
 
 query-string@^4.1.0:
   version "4.3.4"
