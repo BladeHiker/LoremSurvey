@@ -3,6 +3,7 @@ const routes = [
     path: '/survey',
     component: () => import('layouts/MainLayout.vue'),
     children: [
+      {path: '', component: () => import('pages/Survey.vue')},
       {path: ':token', component: () => import('pages/Survey.vue')}
     ]
 
