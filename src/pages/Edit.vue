@@ -1,5 +1,5 @@
 <template>
- Edit {{$route.params.id}}
+  <div>Edit {{ $route.params.id }}</div>
 </template>
 
 <script>
