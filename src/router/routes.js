@@ -3,15 +3,22 @@ const routes = [
     path: '/survey',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      {path: ':token', component: () => import('pages/survey.vue')}
+      {path: ':token', component: () => import('pages/Survey.vue')}
     ]
 
   },
   {
-    path: '/',
+    path: '/index',
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {path: '', component: () => import('pages/Index.vue')}
+    ]
+  },
+  {
+    path: '/edit',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {path: ':id', component: () => import('pages/Edit.vue')}
     ]
   },
 
