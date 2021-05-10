@@ -1,42 +1,65 @@
 <template>
   <q-page class="main-con">
-    <div class="column">
+    <div>
       <div class="paper-header">
         <div class="text-h4 text-center paper-title">问卷标题{{ $route.params.token }}</div>
         <div class="text-center paper-time">2020/1/1~2021/12/31</div>
         <br>
         <div class="text-center">问卷说明文字,问卷说明文字,问卷说明文字,问卷说明文字,问卷说明文字,问卷说明文字</div>
       </div>
-      <div v-for="(problem,i) in problemSet" :key="i" class="ques-section">
-        <div v-if="problem.type===0">
-          <div class="text-h6 ques-title">
-            <b>{{ problem.index }}/ </b>
-            <span>{{ problem.title }}</span>
-            <span v-if="problem.need"> *</span>
-            <q-input label="请输入" outlined v-model="answer[i]"></q-input>
+      <q-form
+        ref="surveyForm"
+        autocorrect="off"
+        autocapitalize="off"
+        autocomplete="off"
+        spellcheck="false"
+        class="column"
+        @validation-error="validError"
+        @submit="submit"
+      >
+        <div v-for="(problem,i) in problemSet" :key="i" class="ques-section">
+          <div v-if="problem.type===0">
+            <div class="text-h6 ques-title">
+              <b>{{ problem.index|formatIndex }} / </b>
+              <span>{{ problem.title }}</span>
+              <span v-if="problem.need" class="text-red"> *</span>
+            </div>
+            <q-input placeholder="请输入"
+                     :dense="true"
+                     filled
+                     v-model="answer[i]"
+                     :rules="[val => !problem.need||(val!=null&&val!='') ||'必填项']"
+            />
+          </div>
+          <div v-else-if="problem.type===1">
+            <div class="text-h6 ques-title">
+              <b>{{ problem.index |formatIndex }} / </b>
+              <span>{{ problem.title }}</span>
+              <span v-if="problem.need" class="text-red"> *</span>
+            </div>
+            <q-field
+              v-model="answer[i]"
+              :rules="[val => !problem.need||val!=null||'必填项']">
+              <template v-slot:control>
+                <q-option-group
+                  v-model="answer[i]"
+                  :options="problem.options"
+                  color="primary"
+                  type="radio"
+                />
+              </template>
+            </q-field>
           </div>
         </div>
-        <div v-else-if="problem.type===1">
-          <div class="text-h6 ques-title">
-            <b>{{ problem.index }}/ </b>
-            <span>{{ problem.title }}</span>
-            <span v-if="problem.need"> *</span>
-          </div>
-          <q-option-group
-            v-model="answer[i]"
-            :options="problem.options"
-            color="primary"
-            type="radio"
-          />
-        </div>
-      </div>
-
-      <q-btn
-        label="提交"
-        color="primary"
-        @click="submit"
-        class="flex-center submit-btn"
-      />
+        <q-btn
+          :label="submitted===1?'提交成功': '提交'"
+          color="primary"
+          type="submit"
+          class="flex-center submit-btn"
+          :disable="submitted!==0"
+          :loading="submitted===-1"
+        />
+      </q-form>
     </div>
     <br>
     <q-separator/>
@@ -79,30 +102,62 @@ export default {
           options: [
             {
               label: 'Option 1',
-              value: 'op1'
+              value: 'A'
             },
             {
               label: 'Option 2',
-              value: 'op2'
+              value: 'B'
             },
             {
               label: 'Option 3',
-              value: 'op3'
+              value: 'C'
             }
           ],
-
-        }],
+        },
+        {
+          type: 1,
+          index: 4,
+          need: false,
+          title: "选择题示例",
+          options: [
+            {
+              label: 'Option 1',
+              value: 'A'
+            },
+            {
+              label: 'Option 2',
+              value: 'B'
+            },
+            {
+              label: 'Option 3',
+              value: 'C'
+            }
+          ],
+        }
+      ],
       answer: [],
-      group:
-        '',
+      submitted: 0,
     }
   },
   created() {
     //鉴权
   },
+  filters: {
+    formatIndex: function (index) {
+      if (index < 10) return '0' + index
+      return index
+    }
+  },
   methods: {
     submit() {
       Notify.create(this.answer.toString())
+      this.submitted = -1
+      setTimeout(() => {
+        this.submitted = 1
+      }, 1000)
+    },
+    validError() {
+      Notify.create("存在未填项")
     }
   }
 }
