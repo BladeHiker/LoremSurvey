@@ -39,7 +39,9 @@
             </div>
             <q-field
               v-model="answer[i]"
-              :rules="[val => !problem.need||val!=null||'必填项']">
+              :rules="[val => !problem.need||val!=null||'必填项']"
+              borderless
+            >
               <template v-slot:control>
                 <q-option-group
                   v-model="answer[i]"
@@ -53,7 +55,7 @@
         </div>
         <q-btn
           :label="submitted===1?'提交成功': '提交'"
-          color="primary"
+          :color="submitted===1?'secondary': 'primary'"
           type="submit"
           class="flex-center submit-btn"
           :disable="submitted!==0"
@@ -150,14 +152,13 @@ export default {
   },
   methods: {
     submit() {
-      Notify.create(this.answer.toString())
       this.submitted = -1
       setTimeout(() => {
         this.submitted = 1
       }, 1000)
     },
     validError() {
-      Notify.create("存在未填项")
+      Notify.create({message: "存在未填项", color: 'negative', position: 'top', timeout: 1500, icon: 'warning'})
     }
   }
 }
