@@ -1,21 +1,18 @@
 const routes = [
   {
-    path: '/index',
-    component: () => import('pages/Index.vue'),
-  },
-  {
     path: '/survey',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/SurveyLayout.vue'),
     children: [
-      {path: '', component: () => import('pages/Survey.vue')},
+      {path: '', redirect: '/'},
       {path: ':token', component: () => import('pages/Survey.vue')}
     ]
   },
   {
-    path: '/edit',
-    component: () => import('layouts/MainLayout.vue'),
+    path: '/',
+    component: () => import('layouts/MasterLayout'),
     children: [
-      {path: ':id', component: () => import('pages/Edit.vue')}
+      {path: '', component: () => import('pages/Welcome')},
+      {path: 'edit/:id', component: () => import('pages/Edit.vue')}
     ]
   },
 

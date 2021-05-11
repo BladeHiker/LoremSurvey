@@ -4,7 +4,7 @@
       <div class="paper-header">
         <div class="text-h4 text-center paper-title">{{ surveyData.title }}</div>
         <div class="text-center paper-time">{{ surveyData.stime }}~{{ surveyData.etime }}</div>
-        <div class="text-center paper-time">ID:{{ $route.params.token }}</div>
+        <div class="text-center paper-time" v-if="$route.params.token">ID:{{ $route.params.token }}</div>
         <br>
         <div class="text-center">{{ surveyData.desc }}</div>
       </div>
@@ -79,11 +79,13 @@
 <script>
 
 import {Notify} from "quasar";
+import {getSurvey} from "src/api/api";
 
 export default {
   name: "survey",
   data() {
     return {
+      // surveyData: null,
       surveyData: {
         title: "编程学习调研问卷",
         stime: "2021/4/1",
@@ -184,10 +186,13 @@ export default {
       },
       answer: [],
       submitted: 0,
+      res: null
     }
   },
-  created() {
+  async created() {
     //鉴权
+    // var res = await getSurvey({id: this.$route.params.token})
+    // this.surveyData = res.data
   }
   ,
   filters: {
@@ -216,6 +221,9 @@ export default {
 .paper-header {
   padding-top: 50px;
   padding-bottom: 20px;
+  max-width: min(100vw, 800px);
+  max-width: 100%;
+  word-wrap: anywhere;
 }
 
 .paper-title {
@@ -228,6 +236,7 @@ export default {
 
 .main-con {
   width: min(100vw, 800px);
+  width: min(100%, 800px);
   padding: 30px;
   background-color: #ffffff;
   overflow-x: hidden;
