@@ -10,6 +10,7 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     config.data = JSON.stringify(config.data);
+    console.log(config)
     config.headers = {
       'Content-Type': 'application/json',
     }

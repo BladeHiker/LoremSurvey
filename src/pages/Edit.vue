@@ -12,9 +12,10 @@
     <q-tab-panels v-model="tab" animated>
       <q-tab-panel name="edit" class="column">
         <q-btn-group spread flat>
-          <q-btn label="选择题" icon="add"/>
-          <q-btn label="填空题" icon="add"/>
+          <q-btn label="选择题" icon="check_box"/>
+          <q-btn label="填空题" icon="question_answer"/>
           <q-btn label="预览" icon="visibility" @click="paperSimulate=true"/>
+          <q-btn label="保存" icon="save"/>
         </q-btn-group>
         <div class="column flex-center">
           <div class="san-grail">
@@ -37,7 +38,7 @@
               <div class="column">
                 <div v-for="(problem,i) in surveyData.problemSet" :key="i" class="ques-section">
                   <div v-if="problem.type===0">
-                    <div>
+                    <div v-if="editing!==i" @click="editing=i" class="editable">
                       <div class="text-h6 ques-title-large">
                         <b>{{ i + 1|formatIndex }} / </b>
                         <span>{{ problem.title }}</span>
@@ -50,27 +51,31 @@
                                v-model="answer[i]"
                       />
                     </div>
+                    <div v-if="editing===i"></div>
+
                   </div>
                   <div v-else-if="problem.type===1">
-                    <div class="text-h6 ques-title">
-                      <b>{{ i + 1 |formatIndex }} / </b>
-                      <span>{{ problem.title }}</span>
-                      <span v-if="problem.need" class="text-red"> *</span>
+                    <div class="editable">
+                      <div class="text-h6 ques-title">
+                        <b>{{ i + 1 |formatIndex }} / </b>
+                        <span>{{ problem.title }}</span>
+                        <span v-if="problem.need" class="text-red"> *</span>
+                      </div>
+                      <q-field
+                        v-model="answer[i]"
+                        borderless
+                        disable
+                      >
+                        <template v-slot:control>
+                          <q-option-group
+                            v-model="answer[i]"
+                            :options="problem.options"
+                            color="primary"
+                            type="radio"
+                          />
+                        </template>
+                      </q-field>
                     </div>
-                    <q-field
-                      v-model="answer[i]"
-                      borderless
-                      disable
-                    >
-                      <template v-slot:control>
-                        <q-option-group
-                          v-model="answer[i]"
-                          :options="problem.options"
-                          color="primary"
-                          type="radio"
-                        />
-                      </template>
-                    </q-field>
                   </div>
                 </div>
               </div>
@@ -100,7 +105,7 @@
 
         </q-header>
 
-        <q-page-container>
+        <q-page-container style="background-color: #F2F2F2">
           <q-page class="column flex-center main-bg">
             <Survey/>
           </q-page>
@@ -229,7 +234,11 @@ export default {
         ]
       },
       answer: [],
+      editing: null
     }
+  },
+  created() {
+
   },
   components: {Survey},
   filters: {
@@ -268,11 +277,14 @@ export default {
   max-width: 100%;
   word-wrap: anywhere;
 }
-.paper-header .editable:hover{
+
+.editable:hover {
   cursor: pointer;
-  border: 1px black solid;
-  margin: -1px;
+  /*border: 1px black solid;*/
+  /*margin: -1px;*/
+  background-color: #E6E6E650;
 }
+
 /*.paper-header .editable:hover::after {*/
 /*  content: "单击编辑";*/
 /*  font-size: small;*/

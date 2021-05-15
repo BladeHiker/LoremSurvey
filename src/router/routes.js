@@ -3,8 +3,8 @@ const routes = [
     path: '/survey',
     component: () => import('layouts/SurveyLayout.vue'),
     children: [
-      {path: '', redirect: '/'},
-      {path: ':token', component: () => import('pages/Survey.vue')}
+      {path: '', component: () => import('pages/Blank')},
+      {path: ':token', component: () => import('pages/Survey.vue')},
     ]
   },
   {
@@ -12,7 +12,19 @@ const routes = [
     component: () => import('layouts/MasterLayout'),
     children: [
       {path: '', component: () => import('pages/Welcome')},
-      {path: 'edit/:id', component: () => import('pages/Edit.vue')}
+      {path: 'login', component: () => import('pages/Login')},
+      {path: 'register', component: () => import('pages/Register')},
+    ]
+  },
+  {
+    path: '/manage',
+    component: () => import('layouts/MasterLayout'),
+    children: [
+      {path: 'edit/:id', component: () => import('pages/Edit')},
+      {path: 'user', component: () => import('pages/User')},
+      {path: 'respondents', component: () => import( 'pages/Respondents')},
+      {path: '', component: () => import('pages/SurveyManager')},
+      {path: '*', redirect: '/manage'}
     ]
   },
 

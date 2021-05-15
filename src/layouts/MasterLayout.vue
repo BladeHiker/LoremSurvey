@@ -4,10 +4,37 @@
       <q-toolbar>
 
         <q-toolbar-title>
-          LoremSurvey
+          <q-btn flat size="20px" no-caps padding="8px 5px" @click="goHome">LoremSurvey</q-btn>
+          <span class="version"> v0.3 <span>开发版本</span></span>
         </q-toolbar-title>
+        <q-btn-dropdown :label="isLogin? userName:'未登录'" icon="account_circle" flat size="15px" padding="12px">
+          <q-list>
+            <q-item clickable v-close-popup v-if="!isLogin">
+              <q-item-section>
+                <q-item-label>登录</q-item-label>
+              </q-item-section>
+            </q-item>
 
-        <div>v0.1a</div>
+            <q-item clickable v-close-popup v-if="isLogin">
+              <q-item-section>
+                <q-item-label>注销</q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-close-popup v-if="!isLogin">
+              <q-item-section>
+                <q-item-label>注册</q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-close-popup v-if="isLogin">
+              <q-item-section>
+                <q-item-label>个人中心</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+
       </q-toolbar>
     </q-header>
 
@@ -22,9 +49,22 @@
 export default {
   name: 'MasterLayout',
   data() {
-    return {}
+    return {
+      isLogin: true,
+      userName: '老段'
+    }
+  },
+  methods: {
+    goHome() {
+      document.location.href = ''
+    }
   }
 }
 </script>
 <style scoped>
+.version {
+  font-size: small;
+  color: rgba(221, 221, 221, 0.62);
+  word-wrap: break-word;
+}
 </style>

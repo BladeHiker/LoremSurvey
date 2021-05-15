@@ -13,9 +13,25 @@ import service from '@/utils/request'
 //	pageSize int
 // }
 export const getApiList = (data) => {
-    return service({
-        url: "/api/getApiList",
-        method: 'post',
-        data
-    })
+  return service({
+    url: "/api/getApiList",
+    method: 'post',
+    data
+  })
+}
+
+export const getSurvey = (data) => {
+  return service({
+    url: "//192.168.164.95:8000/question/answer",
+    method: 'get',
+    params: data
+  })
+}
+
+export const submitSurvey = (data) => {
+  return service({
+    url: "//192.168.164.95:8000/question/answer",
+    method: 'post',
+    data
+  })
 }

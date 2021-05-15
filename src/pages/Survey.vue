@@ -3,7 +3,6 @@
     <div>
       <div class="paper-header">
         <div class="text-h4 text-center paper-title">{{ surveyData.title }}</div>
-        <div class="text-center paper-time">{{ surveyData.stime }}~{{ surveyData.etime }}</div>
         <div class="text-center paper-time" v-if="$route.params.token">ID:{{ $route.params.token }}</div>
         <br>
         <div class="text-center">{{ surveyData.desc }}</div>
@@ -25,11 +24,13 @@
               <span>{{ problem.title }}</span>
               <span v-if="problem.need" class="text-red"> *</span>
             </div>
-            <q-input placeholder="请输入"
-                     :dense="true"
-                     filled
-                     v-model="answer[i]"
-                     :rules="[val => !problem.need||(val!=null&&val!='') ||'必填项']"
+            <q-input
+              :disable="submitted===1"
+              placeholder="请输入"
+              :dense="true"
+              filled
+              v-model="answer.problemSet[i].answer"
+              :rules="[val => !problem.need||(val!=null&&val!='') ||'必填项']"
             />
           </div>
           <div v-else-if="problem.type===1">
@@ -39,13 +40,14 @@
               <span v-if="problem.need" class="text-red"> *</span>
             </div>
             <q-field
-              v-model="answer[i]"
+              v-model="answer.problemSet[i].option"
               :rules="[val => !problem.need||val!=null||'必填项']"
               borderless
+              :disable="submitted===1"
             >
               <template v-slot:control>
                 <q-option-group
-                  v-model="answer[i]"
+                  v-model="answer.problemSet[i].option"
                   :options="problem.options"
                   color="primary"
                   type="radio"
@@ -54,13 +56,21 @@
             </q-field>
           </div>
         </div>
+        <q-btn v-if="surveyData.isopen==='1'"
+               :label="submitted===1?'提交成功': '提交'"
+               :color="submitted===1?'secondary': 'primary'"
+               type="submit"
+               class="flex-center submit-btn"
+               :disable="submitted!==0"
+               :loading="submitted===-1"
+        />
         <q-btn
-          :label="submitted===1?'提交成功': '提交'"
-          :color="submitted===1?'secondary': 'primary'"
-          type="submit"
-          class="flex-center submit-btn"
-          :disable="submitted!==0"
-          :loading="submitted===-1"
+          v-else
+          label="问卷已停止收集"
+          disable
+          flat
+          color="secondary"
+          class="submit-btn flex-center"
         />
       </q-form>
     </div>
@@ -69,8 +79,10 @@
     <div class="paper-footer text-center">
 
       Copyright © 2021 LoremIpsum Team
-      <br>
-      系统由LoremSurvey提供
+      <br/>
+      问卷系统由<span class="no-wrap">LoremSurvey</span>提供
+      <br/>
+      <a href="#" class="q-link">意见反馈</a>
     </div>
 
   </q-page>
@@ -79,7 +91,7 @@
 <script>
 
 import {Notify} from "quasar";
-import {getSurvey} from "src/api/api";
+import {getSurvey, submitSurvey} from "src/api/api";
 
 export default {
   name: "survey",
@@ -87,112 +99,175 @@ export default {
     return {
       // surveyData: null,
       surveyData: {
-        title: "编程学习调研问卷",
-        stime: "2021/4/1",
-        etime: "2021/6/1",
-        desc: "沈阳航空航天大学 软件工程LoremIpsum Team 调查问卷",
-        problemSet: [
+        "title": "编程学习调研问卷",
+        "isopen": "1",
+        "desc": "沈阳航空航天大学 软件工程LoremIpsum Team 调查问卷",
+        "stime": "2021/4/1",
+        "etime": "2021/6/1",
+        "problemSet": [
           {
-            type: 1,
-            index: 1,
-            need: true,
-            title: "您目前的职业是?",
-            options: [
-              {label: '在校学生', value: 1},
-              {label: '政府/机关干部/公务员', value: 2},
-              {label: '企业管理者（包括基层及中高层管理者）', value: 3},
+            "index": 1,
+            "type": 1,
+            "title": "您目前的职业是?",
+            "need": "True",
+            "options": [
               {
-                label: '普通职员（办公室 / 写字楼工作人员）', value: 4
+                "label": "在校学生",
+                "value": "1"
               },
-              {label: '专业人员（如医生 / 律师 / 文体 / 记者 / 老师等）', value: 5},
-              {label: '普通工人（如工厂工人 / 体力劳动者等）', value: 6},
               {
-                label: '商业服务业职工（如销售人员 / 商店职员 / 服务员等）', value: 7
+                "label": "政府/机关干部/公务员",
+                "value": "2"
               },
-              {label: '个体经营者 / 承包商', value: 8},
-              {label: '自由职业者', value: 9},
-              {label: '农林牧渔劳动者', value: 10},
               {
-                label: '退休',
-                value: 11
+                "label": "企业管理者（包括基层及中高层管理者）",
+                "value": "3"
               },
-              {label: '暂无职业', value: 12}
-            ],
-          },
-          {
-            type: 1,
-            index: 2,
-            need: true,
-            title: "您学习编程多久了?",
-            options:
-              [
-                {
-                  label: '不到3个月',
-                  value: 1
-                },
-                {
-                  label: '3-6个月',
-                  value: 2
-                },
-                {
-                  label: '6-12个月',
-                  value: 3
-                },
-                {
-                  label: '1-3年以上',
-                  value: 4
-                },
-                {
-                  label: '3年以上',
-                  value: 5
-                }
-              ],
-          },
-          {
-            type: 0,
-            index: 3,
-            need: false,
-            title: "您如何学习编程?",
-          },
-          {
-            type: 0,
-            index: 4,
-            need: true,
-            title: "您学习的方向是?",
-          },
-          {
-            type: 0,
-            index: 5,
-            need: true,
-            title: "您为什么要学习编程?",
-          },
-          {
-            type: 0,
-            index: 6,
-            need: false,
-            title: "您的联系方式?",
-          },
-          {
-            type: 1,
-            index: 7,
-            need: false,
-            title: "您希望订阅我们的信息吗?",
-            options: [
-              {label: "是", value: true},
-              {label: "否", value: false}
+              {
+                "label": "普通职员（办公室 / 写字楼工作人员）",
+                "value": "4"
+              },
+              {
+                "label": "专业人员（如医生 / 律师 / 文体 / 记者 / 老师等）",
+                "value": "5"
+              },
+              {
+                "label": "普通工人（如工厂工人 / 体力劳动者等）",
+                "value": "6"
+              },
+              {
+                "label": "商业服务业职工（如销售人员 / 商店职员 / 服务员等）",
+                "value": "7"
+              },
+              {
+                "label": "个体经营者 / 承包商",
+                "value": "8"
+              },
+              {
+                "label": "自由职业者",
+                "value": "9"
+              },
+              {
+                "label": "农林牧渔劳动者",
+                "value": "10"
+              },
+              {
+                "label": "退休",
+                "value": "11"
+              },
+              {
+                "label": "暂无职业",
+                "value": "12"
+              },
+              {
+                "label": "others",
+                "value": "#"
+              }
             ]
           },
+          {
+            "index": 2,
+            "type": 1,
+            "title": "您学习编程多久了?",
+            "need": "True",
+            "options": [
+              {
+                "label": "不到3个月",
+                "value": "1"
+              },
+              {
+                "label": "3-6个月",
+                "value": "2"
+              },
+              {
+                "label": "6-12个月",
+                "value": "3"
+              },
+              {
+                "label": "1-3年以上",
+                "value": "4"
+              },
+              {
+                "label": "3年以上",
+                "value": "5"
+              },
+              {
+                "label": "others",
+                "value": "#"
+              }
+            ]
+          },
+          {
+            "index": 7,
+            "type": 1,
+            "title": "您希望订阅我们的信息吗?",
+            "need": "False",
+            "options": [
+              {
+                "label": "是",
+                "value": "True"
+              },
+              {
+                "label": "否",
+                "value": "False"
+              },
+              {
+                "label": "others",
+                "value": "#"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "type": 0,
+            "title": "您如何学习编程?",
+            "need": "False"
+          },
+          {
+            "index": 4,
+            "type": 0,
+            "title": "您学习的方向是?",
+            "need": "True"
+          },
+          {
+            "index": 5,
+            "type": 0,
+            "title": "您为什么要学习编程?",
+            "need": "True"
+          },
+          {
+            "index": 6,
+            "type": 0,
+            "title": "您的联系方式?",
+            "need": "False"
+          }
         ]
       },
-      answer: [],
+      answer: {
+        sessionid: null,
+        problemSet: []
+      },
       submitted: 0,
-      res: null
+      res: null,
+      sessionId: null
     }
   },
   async created() {
     //鉴权
-    // var res = await getSurvey({id: this.$route.params.token})
+    this.sessionId = this.$route.params.token
+    // const res = await getSurvey({sessionid: this.sessionId})
     // this.surveyData = res.data
+    if (this.surveyData.isopen !== '1') this.submitted = 1
+    this.answer.sessionid = this.sessionId
+    for (let i = 0; i < this.surveyData.problemSet.length; ++i) {
+      if (this.surveyData.problemSet[i].type === 1) {
+        //选择题
+        this.answer.problemSet.push({index: i + 1, option: null})
+      } else if (this.surveyData.problemSet[i].type === 0) {
+        //填空题
+        this.answer.problemSet.push({index: i + 1, answer: null})
+      }
+    }
   }
   ,
   filters: {
@@ -205,9 +280,16 @@ export default {
   methods: {
     submit() {
       this.submitted = -1
-      setTimeout(() => {
-        this.submitted = 1
-      }, 1000)
+      submitSurvey(this.answer).then((res)=>{
+        if (res.code === 1) {
+          setTimeout(() => {
+            this.submitted = 1
+          }, 1000)
+        } else {
+          this.submitted = 0
+        }
+      })
+
     }
     ,
     validError() {
@@ -231,6 +313,7 @@ export default {
 }
 
 .paper-time {
+  margin: 5px;
   color: #aaa;
 }
 
