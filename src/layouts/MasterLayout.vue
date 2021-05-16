@@ -2,7 +2,12 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
-
+        <q-ajax-bar
+          ref="bar"
+          position="top"
+          color="accent"
+          size="2px"
+        />
         <q-toolbar-title>
           <q-btn flat size="20px" no-caps padding="8px 5px" @click="goHome">LoremSurvey</q-btn>
           <span class="version"> v0.3 <span>开发版本</span></span>

@@ -36,6 +36,11 @@
           </q-card-actions>
         </q-card>
         <q-btn icon="add_circle_outline" size="80px" dense text-color="grey-4" class="survey-item"></q-btn>
+        <div class="survey-void"></div>
+        <div class="survey-void"></div>
+        <div class="survey-void"></div>
+        <div class="survey-void"></div>
+        <div class="survey-void"></div>
       </div>
     </div>
   </q-page>
@@ -51,6 +56,8 @@ export default {
         {id: 1, name: "问卷标题", isOpen: true},
         {id: 2, name: "问卷标题", isOpen: false},
         {id: 1, name: "问卷标题", isOpen: false},
+        {id: 2, name: "问卷标题", isOpen: false},
+        {id: 2, name: "问卷标题", isOpen: false},
         {id: 2, name: "问卷标题", isOpen: false},
       ],
       colorList: ['primary', 'secondary', 'accent', 'positive', 'info', 'warning']
@@ -101,4 +108,7 @@ export default {
   justify-content: flex-end;
 }
 
+.survey-void {
+  width: 270px;
+}
 </style>
