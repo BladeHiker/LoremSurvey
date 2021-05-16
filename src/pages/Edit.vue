@@ -94,7 +94,7 @@
     </q-tab-panels>
 
     <div class="simulatorFixed" v-if="paperSimulate">
-      <q-layout view="lHh lpr lFf" container style="height: calc(100vh - 120px)" class="shadow-2 rounded-borders">
+      <q-layout view="lHh lpr lFf" container class="shadow-2 rounded-borders simulatorWindow">
         <q-header elevated>
           <q-bar>
             <q-icon name="description"/>
@@ -261,13 +261,24 @@ export default {
   overflow: hidden;
 }
 
+.simulatorWindow {
+  height: calc(100vh - 60px);
+  margin-top: 55px;
+  width: min(1000px, 95vw);
+}
+
 .simulatorFixed {
+  background-color: #aaaaaa;
   position: fixed;
+  top: 0;
   bottom: 0;
   left: 0;
   box-sizing: border-box;
-  width: 90vw;
-  margin: 5vw;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .paper-header {
