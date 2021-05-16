@@ -1,6 +1,13 @@
 <template>
-  <q-page class="flex flex-center">
-    <h1>受访者名单</h1>
+  <q-page class="flex justify-center">
+    <div class="work-area">
+      <div class="manager-header">
+        <div class="text-h3">
+          受访者管理
+        </div>
+        <q-separator color="black"></q-separator>
+      </div>
+    </div>
   </q-page>
 </template>
 

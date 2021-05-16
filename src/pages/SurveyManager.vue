@@ -1,14 +1,21 @@
 <template>
-  <q-page class="flex flex-center">
+  <q-page class="flex justify-center">
     <div class="work-area">
       <div class="manager-header">
         <div class="text-h3">
           问卷管理
-          <q-btn class="float-right right-btn" flat color="primary" icon-right="arrow_forward">受访者管理</q-btn>
         </div>
         <q-separator color="black"></q-separator>
+        <div class="main-btn-group">
+          <q-btn flat color="primary" icon-right="arrow_forward"
+                 @click="routeTo('/manage/respondents')">
+            受访者管理
+          </q-btn>
+          <q-btn flat color="primary" icon-right="arrow_forward">
+            创建问卷
+          </q-btn>
+        </div>
       </div>
-      <br/>
       <div class="flex row surveys">
         <q-card v-for="(item,i) in surveyList" v-bind:key="i" class="survey-item">
           <q-card-section class="survey-top text-white" :class="'bg-'+ colorList[i*7%6]">
@@ -22,14 +29,13 @@
               停止收集
             </div>
           </q-card-section>
-
           <q-separator dark/>
-
           <q-card-actions>
             <q-btn flat color="primary" @click="routeTo('manage/edit/'+item.id)">管理</q-btn>
             <q-btn flat color="red">删除</q-btn>
           </q-card-actions>
         </q-card>
+        <q-btn icon="add_circle_outline" size="80px" dense text-color="grey-4" class="survey-item"></q-btn>
       </div>
     </div>
   </q-page>
@@ -41,12 +47,10 @@ export default {
   data() {
     return {
       surveyList: [
+        {id: 1, name: "软件工程调查问卷", isOpen: true},
         {id: 1, name: "问卷标题", isOpen: true},
-        {id: 2, name: "问卷标题", isOpen: false}, {id: 1, name: "问卷标题", isOpen: true},
-        {id: 2, name: "问卷标题", isOpen: false}, {id: 1, name: "问卷标题", isOpen: true},
-        {id: 2, name: "问卷标题", isOpen: false}, {id: 1, name: "问卷标题", isOpen: true},
-        {id: 2, name: "问卷标题", isOpen: false}, {id: 1, name: "问卷标题", isOpen: true},
-        {id: 2, name: "问卷标题", isOpen: false}, {id: 1, name: "问卷标题", isOpen: true},
+        {id: 2, name: "问卷标题", isOpen: false},
+        {id: 1, name: "问卷标题", isOpen: false},
         {id: 2, name: "问卷标题", isOpen: false},
       ],
       colorList: ['primary', 'secondary', 'accent', 'positive', 'info', 'warning']
@@ -64,8 +68,7 @@ export default {
 .survey-item {
   width: 270px;
   height: 215px;
-  margin-right: 15px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .surveys {
@@ -86,14 +89,16 @@ export default {
   text-shadow: 3px 2px 11px #2d2d2da3;
 }
 
-.manager-header {
-  margin: 30px 20px;
-}
 
-.manager-header div{
+.manager-header div {
   margin-bottom: 10px;
 }
-.right-btn{
-  margin-top: 20px;
+
+
+.main-btn-group {
+  margin: 20px 0;
+  display: flex;
+  justify-content: flex-end;
 }
+
 </style>

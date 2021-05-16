@@ -4,8 +4,8 @@
       <h3 class="welcome-title">
         <span>欢迎使用</span> <br>
         <span class="no-wrap">
-          <span> Lorem</span>
-          <span> Survey</span>
+          <span>Lorem</span>
+          <span>Survey</span>
         </span>
         <span style="word-break: keep-all"> 调查问卷系统</span>
       </h3>
