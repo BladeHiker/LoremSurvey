@@ -1,15 +1,99 @@
 <template>
   <q-page class="flex flex-center">
-    <h1>问卷管理</h1>
+    <div class="work-area">
+      <div class="manager-header">
+        <div class="text-h3">
+          问卷管理
+          <q-btn class="float-right right-btn" flat color="primary" icon-right="arrow_forward">受访者管理</q-btn>
+        </div>
+        <q-separator color="black"></q-separator>
+      </div>
+      <br/>
+      <div class="flex row surveys">
+        <q-card v-for="(item,i) in surveyList" v-bind:key="i" class="survey-item">
+          <q-card-section class="survey-top text-white" :class="'bg-'+ colorList[i*7%6]">
+            <div class="text-h6">{{ item.name }}</div>
+            <div class="text-subtitle2" v-if="item.isOpen">
+              <q-icon name="fiber_manual_record" color="light-green"></q-icon>
+              收集中
+            </div>
+            <div class="text-subtitle2" v-else>
+              <q-icon name="fiber_manual_record" color="red"></q-icon>
+              停止收集
+            </div>
+          </q-card-section>
+
+          <q-separator dark/>
+
+          <q-card-actions>
+            <q-btn flat color="primary" @click="routeTo('manage/edit/'+item.id)">管理</q-btn>
+            <q-btn flat color="red">删除</q-btn>
+          </q-card-actions>
+        </q-card>
+      </div>
+    </div>
   </q-page>
 </template>
 
 <script>
 export default {
-  name: "SurveyManager"
+  name: "SurveyManager",
+  data() {
+    return {
+      surveyList: [
+        {id: 1, name: "问卷标题", isOpen: true},
+        {id: 2, name: "问卷标题", isOpen: false}, {id: 1, name: "问卷标题", isOpen: true},
+        {id: 2, name: "问卷标题", isOpen: false}, {id: 1, name: "问卷标题", isOpen: true},
+        {id: 2, name: "问卷标题", isOpen: false}, {id: 1, name: "问卷标题", isOpen: true},
+        {id: 2, name: "问卷标题", isOpen: false}, {id: 1, name: "问卷标题", isOpen: true},
+        {id: 2, name: "问卷标题", isOpen: false}, {id: 1, name: "问卷标题", isOpen: true},
+        {id: 2, name: "问卷标题", isOpen: false},
+      ],
+      colorList: ['primary', 'secondary', 'accent', 'positive', 'info', 'warning']
+    }
+  },
+  methods: {
+    routeTo(url) {
+      this.$router.push(url)
+    }
+  }
 }
 </script>
 
 <style scoped>
+.survey-item {
+  width: 270px;
+  height: 215px;
+  margin-right: 15px;
+  margin-bottom: 15px;
+}
 
+.surveys {
+  justify-content: space-around;
+}
+
+.survey-item .text-h6 {
+  height: 115px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+}
+
+.survey-top {
+  height: 160px;
+  text-shadow: 3px 2px 11px #2d2d2da3;
+}
+
+.manager-header {
+  margin: 30px 20px;
+}
+
+.manager-header div{
+  margin-bottom: 10px;
+}
+.right-btn{
+  margin-top: 20px;
+}
 </style>

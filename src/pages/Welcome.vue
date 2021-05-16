@@ -1,8 +1,10 @@
 <template>
   <div class="q-pa-md column flex-center">
-    <div class="san-grail">
-      <h4>欢迎使用 <br> <span class="no-wrap">LoremSurvey</span>  <span class="no-wrap">问卷系统</span></h4>
-      <q-btn rounded push color="primary" size="15px" icon-right="arrow_forward">开始使用</q-btn>
+    <div class="work-area">
+      <h3>欢迎使用 <br> <span class="no-wrap">LoremSurvey</span> 问卷系统</h3>
+      <q-btn rounded push color="primary" size="15px" icon-right="arrow_forward" @click="routeTo('manage')">开始使用
+      </q-btn>
+
       <!--      <q-card>-->
       <!--        <q-card-section horizontal class="start-panel">-->
       <!--          <q-card-section class="col-6 column text-center">-->
@@ -39,7 +41,15 @@
 
 <script>
 export default {
-  name: "Welcome"
+  name: "Welcome",
+  data() {
+    return {}
+  },
+  methods: {
+    routeTo(url) {
+      this.$router.push(url)
+    }
+  }
 }
 </script>
 
