@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-md column flex-center">
     <div class="work-area">
-      <h3>欢迎使用 <br> <span class="no-wrap">LoremSurvey</span> 问卷系统</h3>
+      <h3 class="welcome-title">欢迎使用 <br> <span class="no-wrap">LoremSurvey</span> <span style="word-break: keep-all">调查问卷系统</span></h3>
       <q-btn rounded push color="primary" size="15px" icon-right="arrow_forward" @click="routeTo('manage')">开始使用
       </q-btn>
 
@@ -65,5 +65,10 @@ export default {
 
 .children-margin * {
   margin: 5px 0;
+}
+
+.welcome-title{
+  line-height: 60px;
+  letter-spacing: 05px;
 }
 </style>
