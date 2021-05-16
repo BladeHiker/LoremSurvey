@@ -70,5 +70,6 @@ export default {
 .welcome-title{
   line-height: 60px;
   letter-spacing: 05px;
+  max-width: 90vw;
 }
 </style>
