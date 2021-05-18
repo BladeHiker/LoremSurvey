@@ -84,11 +84,7 @@
         </div>
       </q-tab-panel>
       <q-tab-panel name="send">
-        <q-uploader
-          url="http://192.168.236.95:8000/app_01/receivefile/"
-          accept=".xls,.xlsx"
-          max-files="1"
-        />
+
       </q-tab-panel>
       <q-tab-panel name="response">123</q-tab-panel>
     </q-tab-panels>
@@ -268,7 +264,7 @@ export default {
 }
 
 .simulatorFixed {
-  background-color: #aaaaaa;
+  background-color: rgba(170, 170, 170, 0.6);
   position: fixed;
   top: 0;
   bottom: 0;

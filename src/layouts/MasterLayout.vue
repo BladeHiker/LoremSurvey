@@ -16,25 +16,25 @@
           <q-list>
             <q-item clickable v-close-popup v-if="!isLogin">
               <q-item-section>
-                <q-item-label>登录</q-item-label>
+                <q-item-label @click="routeTo('login')">登录</q-item-label>
               </q-item-section>
             </q-item>
 
             <q-item clickable v-close-popup v-if="isLogin">
               <q-item-section>
-                <q-item-label>注销</q-item-label>
+                <q-item-label @click="onLogout">注销</q-item-label>
               </q-item-section>
             </q-item>
 
             <q-item clickable v-close-popup v-if="!isLogin">
               <q-item-section>
-                <q-item-label>注册</q-item-label>
+                <q-item-label @click="routeTo('register')">注册</q-item-label>
               </q-item-section>
             </q-item>
 
             <q-item clickable v-close-popup v-if="isLogin">
               <q-item-section>
-                <q-item-label>个人中心</q-item-label>
+                <q-item-label @click="routeTo('manage/user')">个人中心</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -51,17 +51,35 @@
 
 <script>
 
+import {logout} from "src/api/api";
+
 export default {
   name: 'MasterLayout',
   data() {
     return {
       isLogin: true,
-      userName: '老段'
+      userName: null
     }
+  },
+  created() {
+    if (this.$cookies.isKey('Username')) {
+      this.userName = this.$cookies.get('Username')
+      this.isLogin = true
+    } else
+      this.isLogin = false
+
   },
   methods: {
     goHome() {
       document.location.href = ''
+    },
+    routeTo(url) {
+      this.$router.push(url)
+    },
+    onLogout() {
+      this.$cookies.remove('Username')
+      logout()
+      this.isLogin = false
     }
   }
 }

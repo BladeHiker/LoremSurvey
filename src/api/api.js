@@ -22,7 +22,7 @@ export const getApiList = (data) => {
 
 export const getSurvey = (data) => {
   return service({
-    url: "//192.168.164.95:8000/question/answer",
+    url: "//192.168.243.95:8000/question/answer",
     method: 'get',
     params: data
   })
@@ -30,7 +30,38 @@ export const getSurvey = (data) => {
 
 export const submitSurvey = (data) => {
   return service({
-    url: "//192.168.164.95:8000/question/answer",
+    url: "//192.168.243.95:8000/question/answer",
+    method: 'post',
+    data
+  })
+}
+
+export const deleteSurvey = (data) => {
+  return service({
+    url: "//192.168.243.95:8000/question/manage",
+    method: 'delete',
+    data
+  })
+}
+
+export const login = (data) => {
+  return service({
+    url: "//0.0.0.0:8000/user/login",
+    method: 'post',
+    data
+  })
+}
+export const register = (data) => {
+  return service({
+    url: "//0.0.0.0:8000/user/register",
+    method: 'post',
+    data
+  })
+}
+
+export const logout = (data) => {
+  return service({
+    url: "//0.0.0.0:8000/user/logout",
     method: 'post',
     data
   })

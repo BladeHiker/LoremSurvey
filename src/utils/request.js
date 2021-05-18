@@ -6,6 +6,8 @@ const service = axios.create({
   timeout: 99999
 })
 
+service.defaults.withCredentials = true
+
 //http request 拦截器
 service.interceptors.request.use(
   config => {
@@ -27,6 +29,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   response => {
     if (response.data.code === 0 || response.headers.success === "true") {
+      console.log(response)
       return response.data
     }
   },

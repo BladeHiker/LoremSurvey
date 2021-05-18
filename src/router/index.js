@@ -1,9 +1,13 @@
 import Vue from 'vue'
+import md5 from "js-md5"
+import VueCookies from 'vue-cookies'
+import routes from './routes'
 import VueRouter from 'vue-router'
 
-import routes from './routes'
-
+Vue.prototype.$md5 = md5
+Vue.use(VueCookies)
 Vue.use(VueRouter)
+
 
 /*
  * If not building with SSR mode, you can
@@ -16,7 +20,7 @@ Vue.use(VueRouter)
 
 export default function (/* { store, ssrContext } */) {
   const Router = new VueRouter({
-    scrollBehavior: () => ({ x: 0, y: 0 }),
+    scrollBehavior: () => ({x: 0, y: 0}),
     routes,
 
     // Leave these as they are and change in quasar.conf.js instead!

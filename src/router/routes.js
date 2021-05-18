@@ -19,6 +19,11 @@ const routes = [
   {
     path: '/manage',
     component: () => import('layouts/MasterLayout'),
+    beforeEnter: (to, from, next) => {
+      const isLogin = document.cookie.match(new RegExp("(^| )Username=([^;]*)(;|$)"))
+      if (!isLogin) next({path: '/login'})
+      else next()
+    },
     children: [
       {path: 'edit/:id', component: () => import('pages/Edit')},
       {path: 'user', component: () => import('pages/User')},
@@ -28,8 +33,8 @@ const routes = [
     ]
   },
 
-  // Always leave this as last one,
-  // but you can also remove it
+// Always leave this as last one,
+// but you can also remove it
   {
     path: '*',
     component: () => import('pages/Error404.vue')

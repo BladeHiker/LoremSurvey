@@ -102,12 +102,6 @@ export default {
 }
 
 
-.main-btn-group {
-  margin: 20px 0;
-  display: flex;
-  justify-content: flex-end;
-}
-
 .survey-void {
   width: 270px;
 }
