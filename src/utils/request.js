@@ -1,12 +1,12 @@
 import axios from 'axios'; // 引入axios
 import {Notify} from "quasar";
 
+const URL_Prefix = "//localhost:8000/api/"
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
-  timeout: 99999
+  timeout: 99999,
+  withCredentials: true
 })
-
-service.defaults.withCredentials = true
 
 //http request 拦截器
 service.interceptors.request.use(
@@ -40,4 +40,4 @@ service.interceptors.response.use(
   }
 )
 
-export default service
+export {service, URL_Prefix}

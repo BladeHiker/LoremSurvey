@@ -15,7 +15,7 @@
           <q-btn label="选择题" icon="check_box"/>
           <q-btn label="填空题" icon="question_answer"/>
           <q-btn label="预览" icon="visibility" @click="paperSimulate=true"/>
-          <q-btn label="保存" icon="save"/>
+          <q-btn label="保存" icon="save" @click="onSave"/>
         </q-btn-group>
         <div class="column flex-center">
           <div class="san-grail">
@@ -84,7 +84,25 @@
         </div>
       </q-tab-panel>
       <q-tab-panel name="send">
-
+        <div class="q-pa-md">
+          <q-table
+            title="受访者"
+            :data="respondentData"
+            :columns="columns"
+            row-key="name"
+            :selected-rows-label="getSelectedString"
+            selection="multiple"
+            :selected.sync="selected"
+          >
+            <template v-slot:top-right>
+              <div class="flex row">
+                <q-space style="width: 10px"/>
+                <q-btn color="primary" :disable="selected.length===0" @click="onSend">发送问卷
+                </q-btn>
+              </div>
+            </template>
+          </q-table>
+        </div>
       </q-tab-panel>
       <q-tab-panel name="response">123</q-tab-panel>
     </q-tab-panels>
@@ -113,6 +131,7 @@
 
 <script>
 import Survey from "pages/Survey";
+import {getSurveyRespondentList, sendSurveyToRespondents} from "src/api/surveyAdmin";
 
 export default {
   name: "Edit",
@@ -230,11 +249,31 @@ export default {
         ]
       },
       answer: [],
-      editing: null
+      editing: null,
+      respondentData: [],
+      id: this.$route.params.id,
+      selected: [],
+      columns: [
+        {
+          name: 'id',
+          required: true,
+          label: '学号/工号',
+          field: 'id',
+          sortable: true
+        },
+        {name: 'name', label: '姓名', field: 'name', sortable: true},
+        {name: 'school', label: '学校', field: 'school', sortable: true},
+        {name: 'sex', label: '性别', field: 'sex'},
+        {name: 'phone', label: '手机号', field: 'phone'},
+        {name: 'email', label: '邮箱', field: 'email'},
+        {name: 'status', label: '状态', field: 'status', format: val => val === 0 ? "未发送" : "已发送"},
+      ],
     }
   },
   created() {
-
+    getSurveyRespondentList({id: this.id}).then(res => {
+      this.respondentData = res.data
+    })
   },
   components: {Survey},
   filters: {
@@ -246,6 +285,19 @@ export default {
   methods: {
     hideSimulate() {
       this.paperSimulate = false
+    },
+    getSelectedString() {
+      return this.selected.length === 0 ? '' : `${this.selected.length} record${this.selected.length > 1 ? 's' : ''} selected of ${this.respondentData.length}`
+    },
+    onSave() {
+
+    },
+    onSend() {
+      let sendList = []
+      for (let i = 0; i < this.selected.length; i++) {
+        sendList.push(this.selected[i].id)
+      }
+      sendSurveyToRespondents({id: this.id, userlist: sendList})
     }
   }
 }

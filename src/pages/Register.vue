@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex justify-center">
-    <q-form @submit="onLogin"
+    <q-form @submit="onRegister"
             autocorrect="off"
             autocapitalize="off"
             autocomplete="off"
@@ -90,7 +90,7 @@
 
 <script>
 
-import {login} from "src/api/api";
+import {register} from "src/api/api";
 
 
 export default {
@@ -105,7 +105,7 @@ export default {
         email: ""
       },
       passwordAgain: "",
-      loading: false
+      loading: false,
     };
   },
   created() {
@@ -115,11 +115,17 @@ export default {
     toLogin() {
       this.$router.push('login')
     },
-    onLogin() {
+    onRegister() {
       this.loading = true
       this.registerForm.password = this.$md5(this.registerForm.password)
       register(this.registerForm).then(res => {
-        this.registerForm.password = ""
+        if (res.code === 0) {
+          this.loading = false
+          //注册成功
+          this.toLogin()
+        }
+      }).catch(() => {
+        this.loading = false
       })
 
     }

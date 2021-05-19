@@ -11,7 +11,7 @@
                  @click="routeTo('/manage/respondents')">
             受访者管理
           </q-btn>
-          <q-btn flat color="primary" icon-right="arrow_forward">
+          <q-btn flat color="primary" icon-right="arrow_forward" @click="onCreateSurvey">
             创建问卷
           </q-btn>
         </div>
@@ -19,14 +19,14 @@
       <div class="flex row surveys">
         <q-card v-for="(item,i) in surveyList" v-bind:key="i" class="survey-item">
           <q-card-section class="survey-top text-white" :class="'bg-'+ colorList[i*7%6]">
-            <div class="text-h6">{{ item.name }}</div>
-            <div class="text-subtitle2" v-if="item.isOpen">
+            <div class="text-h6">{{ item.title }}</div>
+            <div class="text-subtitle2" v-if="item.isopen==='1'">
               <q-icon name="fiber_manual_record" color="light-green"></q-icon>
-              收集中
+              开放问卷
             </div>
             <div class="text-subtitle2" v-else>
               <q-icon name="fiber_manual_record" color="red"></q-icon>
-              停止收集
+              定向问卷
             </div>
           </q-card-section>
           <q-separator dark/>
@@ -47,25 +47,37 @@
 </template>
 
 <script>
+import {createSurveyItem, getSurveyList} from "src/api/surveyAdmin";
+
 export default {
   name: "SurveyManager",
   data() {
     return {
       surveyList: [
-        {id: 1, name: "软件工程调查问卷", isOpen: true},
-        {id: 1, name: "问卷标题", isOpen: true},
-        {id: 2, name: "问卷标题", isOpen: false},
-        {id: 1, name: "问卷标题", isOpen: false},
-        {id: 2, name: "问卷标题", isOpen: false},
-        {id: 2, name: "问卷标题", isOpen: false},
-        {id: 2, name: "问卷标题", isOpen: false},
       ],
       colorList: ['primary', 'secondary', 'accent', 'positive', 'info', 'warning']
     }
   },
+  created() {
+    getSurveyList().then(res => {
+      this.surveyList = res.data
+    })
+  },
   methods: {
     routeTo(url) {
       this.$router.push(url)
+    },
+    onCreateSurvey() {
+      createSurveyItem({
+        isopen: 0,
+        title: "无标题问卷",
+        stime: null,
+        etime: null,
+        desc: "",
+        problemSet: []
+      }).then(res => {
+        this.routeTo('manage/edit/' + res.data.id)
+      })
     }
   }
 }

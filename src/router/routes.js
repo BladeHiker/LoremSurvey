@@ -20,7 +20,7 @@ const routes = [
     path: '/manage',
     component: () => import('layouts/MasterLayout'),
     beforeEnter: (to, from, next) => {
-      const isLogin = document.cookie.match(new RegExp("(^| )Username=([^;]*)(;|$)"))
+      const isLogin = document.cookie.match(new RegExp("(^| )username=([^;]*)(;|$)"))
       if (!isLogin) next({path: '/login'})
       else next()
     },

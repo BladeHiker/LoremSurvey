@@ -62,8 +62,8 @@ export default {
     }
   },
   created() {
-    if (this.$cookies.isKey('Username')) {
-      this.userName = this.$cookies.get('Username')
+    if (this.$cookies.isKey('username')) {
+      this.userName = this.$cookies.get('username')
       this.isLogin = true
     } else
       this.isLogin = false
@@ -77,7 +77,7 @@ export default {
       this.$router.push(url)
     },
     onLogout() {
-      this.$cookies.remove('Username')
+      this.$cookies.remove('username')
       logout()
       this.isLogin = false
     }
