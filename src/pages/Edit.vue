@@ -3,10 +3,12 @@
     <q-toolbar class="bg-blue-grey-1 flex flex-center text-teal">
       <q-icon name="description"/>
       &nbsp;
-      <div class="text-weight-bold edit-title">
+      <div class="text-weight-bold edit-title" v-if="surveyData.title!==''">
         {{ surveyData.title }}
       </div>
-
+      <div class="text-weight-bold edit-title" v-else>
+        <i>无标题问卷</i>
+      </div>
       <span v-if="isEditing"> &nbsp;-&nbsp;正在编辑</span>
       <span v-else> &nbsp;-&nbsp;已保存</span>
     </q-toolbar>
@@ -29,7 +31,8 @@
             <div class="q-ma-lg">
               <div class="paper-header">
                 <div class="text-h4 editable text-center paper-title">
-                  {{ (!surveyData.title || surveyData.title === '') ? '设置标题' : surveyData.title }}
+                  <span v-if="surveyData.title!==''">{{ surveyData.title }}</span>
+                  <span v-else class="text-green-5"><i>点击设置标题</i></span>
                   <q-popup-edit v-model="surveyData.title" title="编辑标题" buttons @input="changeData" @save="changeData">
                     <q-input v-model="surveyData.title" placeholder="请输入问卷标题"
                              :rules="[val=>val&&val!==''||'请输入标题']"
@@ -38,7 +41,8 @@
                 </div>
                 <br>
                 <div class="text-center editable">
-                  <div v-html="surveyData.desc===''?'<i>添加描述</i>':surveyData.desc"></div>
+                  <span v-if="surveyData.desc!==''" v-html="surveyData.desc"></span>
+                  <span v-else class="text-green-5"><i>点击添加问卷说明</i></span>
                   <q-popup-edit v-model="surveyData.desc" title="编辑描述" buttons @save="changeData">
                     <q-editor v-model="surveyData.desc" dense autofocus counter/>
                   </q-popup-edit>
@@ -50,7 +54,8 @@
                     <div v-if="editing!==pid" @click="editing=pid" class="editable">
                       <div class="text-h6 ques-title-large">
                         <b>{{ pid + 1|formatIndex }} / </b>
-                        <span>{{ problem.title }}</span>
+                        <span v-if="problem.title!==''">{{ problem.title }}</span>
+                        <span v-else class="text-green-5"><i>点击编辑问题</i></span>
                         <span v-if="problem.need" class="text-red"> *</span>
                       </div>
                       <q-input placeholder="请输入"
@@ -66,19 +71,14 @@
                         <input v-model="problem.title" placeholder="输入问题" minlength="1" maxlength="128"
                                class="input-title"/>
                         <span v-if="problem.need" class="text-red"> *</span>
-                        <div class="text-grey-8 q-gutter-xs text-right text-body1">
+                        <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
                           <q-toggle label="必填项" dense v-model="problem.need"/>
-                          <q-btn flat dense icon="arrow_upward" label="上移"/>
-                          <q-btn flat dense icon="arrow_downward" label="下移"/>
-                          <q-btn flat dense icon="close" label="删除"/>
+                          <q-btn flat dense icon="arrow_upward" label="上移" @click="upProblem(pid)"/>
+                          <q-btn flat dense icon="arrow_downward" label="下移" @click="downProblem(pid)"/>
+                          <q-btn flat dense icon="close" label="删除" @click="delProblem(pid)"/>
+                          <q-btn flat dense icon="check" label="完成" @click="editing=-1"/>
                         </div>
                       </div>
-                      <q-input placeholder="请输入"
-                               disable
-                               :dense="true"
-                               filled
-                               v-model="answer[pid]"
-                      />
                     </div>
 
                   </div>
@@ -86,7 +86,8 @@
                     <div class="editable" @click="editing=pid" v-if="editing!==pid">
                       <div class="text-h6 ques-title">
                         <b>{{ pid + 1 |formatIndex }} / </b>
-                        <span>{{ problem.title }}</span>
+                        <span v-if="problem.title!==''">{{ problem.title }}</span>
+                        <span v-else class="text-green-5"><i>点击编辑问题</i></span>
                         <span v-if="problem.need" class="text-red"> *</span>
                       </div>
                       <q-field
@@ -110,19 +111,29 @@
                         <input v-model="problem.title" placeholder="输入问题" minlength="1" maxlength="128"
                                class="input-title"/>
                         <span v-if="problem.need" class="text-red"> *</span>
-                        <div class="text-grey-8 q-gutter-xs text-right text-body1">
+                        <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
                           <q-toggle label="必填项" dense v-model="problem.need"/>
-                          <q-btn flat dense icon="arrow_upward" label="上移"/>
-                          <q-btn flat dense icon="arrow_downward" label="下移"/>
-                          <q-btn flat dense icon="close" label="删除"/>
+                          <q-btn flat dense icon="arrow_upward" label="上移" @click="upProblem(pid)"/>
+                          <q-btn flat dense icon="arrow_downward" label="下移" @click="downProblem(pid)"/>
+                          <q-btn flat dense icon="close" label="删除" @click="delProblem(pid)"/>
+                          <q-btn flat dense icon="check" label="完成" @click="editing=-1"/>
                         </div>
                       </div>
                       <q-list bordered class="rounded-borders">
-                        <q-item-label header>编辑选项</q-item-label>
+                        <q-item-label header>选项列表</q-item-label>
                         <q-separator/>
+                        <q-item v-if="problem.options.length===0">
+                          <div class="q-ma-sm">
+                            <q-icon name="warning"/>
+                            <span>&nbsp;请添加选项</span>
+                          </div>
+                        </q-item>
                         <q-item v-for="(item,i) in problem.options" :key="i">
                           <q-item-section>
-                            <input v-model="item.label" class="input-nostyle" placeholder="输入选项"/>
+                            <div>
+                              <q-chip dense square>{{ i + 1 }}</q-chip>
+                              <input v-model="item.label" class="input-option" placeholder="输入选项"/>
+                            </div>
                           </q-item-section>
                           <q-item-section top side>
                             <div class="text-grey-8 q-gutter-xs">
@@ -136,7 +147,10 @@
                         <q-separator/>
                         <q-item>
                           <q-item-section>
-                            <input v-model="templateOptions.label" class="input-nostyle" placeholder="新选项"/>
+                            <div>
+                              <q-icon size="12px" style="width: 25px" name="create"/>
+                              <input v-model="templateOptions.label" class="input-option" placeholder="添加选项"/>
+                            </div>
                           </q-item-section>
                           <q-item-section top side>
                             <div class="text-grey-8 q-gutter-xs">
@@ -154,8 +168,8 @@
         </div>
         <q-footer v-show="!paperSimulate" elevated>
           <q-btn-group spread flat>
-            <q-btn label="选择题" icon="check_box" @click="addChoiceQuestion"/>
-            <q-btn label="填空题" icon="question_answer" @click="addBlankQuestion"/>
+            <q-btn label="添加选择题" icon="check_box" @click="addChoiceQuestion"/>
+            <q-btn label="添加填空题" icon="question_answer" @click="addBlankQuestion"/>
             <q-btn label="预览" icon="visibility" @click="paperSimulate=true"/>
             <q-btn label="保存" icon="save" @click="onSave"/>
           </q-btn-group>
@@ -382,6 +396,33 @@ export default {
     }
   },
   methods: {
+    upProblem(pid) {
+      if (pid) {
+        const t = this.surveyData.problemSet[pid - 1].index
+        this.surveyData.problemSet[pid - 1].index = this.surveyData.problemSet[pid].index
+        this.surveyData.problemSet[pid].index = t
+        this.sortProblems()
+        --this.editing
+      }
+    },
+    downProblem(pid) {
+      if (pid + 1 !== this.surveyData.problemSet.length) {
+        const t = this.surveyData.problemSet[pid].index
+        this.surveyData.problemSet[pid].index = this.surveyData.problemSet[pid + 1].index
+        this.surveyData.problemSet[pid + 1].index = t
+        this.sortProblems()
+        ++this.editing
+      }
+    },
+    delProblem(pid) {
+      console.log(pid)
+      for (let i = pid; i < this.surveyData.problemSet.length - 1; ++i) {
+        this.surveyData.problemSet[i] = this.surveyData.problemSet[i + 1]
+        this.surveyData.problemSet[i].index = i + 1
+      }
+      this.editing = -1
+      this.surveyData.problemSet.splice(this.surveyData.problemSet.length - 1, 1)
+    },
     upOption(pid, oid) {
       if (oid > 0) {
         const t = this.surveyData.problemSet[pid].options[oid - 1].value
@@ -424,12 +465,15 @@ export default {
           this.getRespondentList()
       }
     },
-    async getSurveyData() {
-      const res = await getSurveyItem({id: this.id})
-      this.surveyData = res.data.data
+    sortProblems() {
       this.surveyData.problemSet.sort((a, b) => {
         return a.index > b.index ? 1 : -1
       })
+    },
+    async getSurveyData() {
+      const res = await getSurveyItem({id: this.id})
+      this.surveyData = res.data.data
+      this.sortProblems()
       for (let i = 0; i < this.surveyData.problemSet.length; i++) {
         if (this.surveyData.problemSet[i].type === 1) {
           this.surveyData.problemSet[i].options.sort((a, b) => {
@@ -467,6 +511,7 @@ export default {
         sendList.push(this.selected[i].id)
       }
       sendSurveyToRespondents({id: this.id, userlist: sendList}).then(() => {
+        Notify.create({message: "发送成功", color: 'secondary', position: 'top', timeout: 1500})
         this.getRespondentList()
       })
     },
@@ -475,15 +520,9 @@ export default {
           type: 1,
           index: this.surveyData.problemSet.length + 1,
           need: false,
-          title: "选择题",
+          title: "",
           desc: "",
-          options:
-            [
-              {
-                label: '选项',
-                value: 1
-              },
-            ],
+          options: [],
         }
       )
     },
@@ -492,7 +531,7 @@ export default {
         type: 0,
         index: this.surveyData.problemSet.length + 1,
         need: false,
-        title: "填空题",
+        title: "",
         desc: ""
       },)
     }
@@ -501,13 +540,21 @@ export default {
 </script>
 
 <style scoped>
-.input-title {
-  width: calc(100% - 60px);
+.question-btn {
+  padding-right: 16px;
 }
 
-.input-title, .input-nostyle {
+.input-title {
   outline: none;
+  width: calc(100% - 60px);
   border: none;
+  border-bottom: #1976D2 dashed 1px;
+}
+
+.input-option {
+  border: none;
+  outline: none;
+  width: calc(100% - 30px);
 }
 
 .edit-title {
