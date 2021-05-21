@@ -6,11 +6,6 @@
           受访者管理
         </div>
         <q-separator color="black"></q-separator>
-        <div class="main-btn-group">
-          <q-btn flat color="primary" icon-right="arrow_forward">
-            导入受访者列表
-          </q-btn>
-        </div>
       </div>
       <div class="q-pa-md">
         <q-table
@@ -24,7 +19,7 @@
         >
           <template v-slot:top-right>
             <div class="flex row">
-              <q-btn color="primary" @click="onDel">上传
+              <q-btn color="primary" @click="upload=true">上传
               </q-btn>
               <q-space style="width: 10px"/>
               <q-btn color="red" :disable="selected.length===0" @click="onDel">删除
@@ -34,13 +29,23 @@
           </template>
         </q-table>
       </div>
+      <q-dialog v-model="upload" @hide="getData">
+        <q-card class="q-pa-sm bg-grey-2">
+          <q-card-section>
+            <div class="text-h6">上传受访者名单(.XLS/.XLSX)</div>
+          </q-card-section>
+          <q-separator/>
+          <q-card-section>
+            <q-uploader
+              :url="URL"
+              accept=".xls,.xlsx"
+              max-files="1"
+              bordered
+            />
+          </q-card-section>
+        </q-card>
+      </q-dialog>
 
-      <q-uploader
-        :url="URL"
-        accept=".xls,.xlsx"
-        max-files="1"
-
-      />
     </div>
   </q-page>
 </template>
@@ -54,6 +59,7 @@ export default {
   data() {
     return {
       selected: [],
+      upload: false,
       columns: [
         {
           name: 'id',
@@ -68,18 +74,19 @@ export default {
         {name: 'phone', label: '手机号', field: 'phone'},
         {name: 'email', label: '邮箱', field: 'email'},
       ],
-      data: [
-        {}
-      ],
-      URL: URL_Prefix + '/question/respondents'
+      data: [],
+      URL: '/api/question/respondents'
     }
   },
   created() {
-    getRespondentList().then(res => {
-      this.data = res.data
-    })
+    this.getData()
   },
   methods: {
+    getData() {
+      getRespondentList().then(res => {
+        this.data = res.data.data
+      })
+    },
     getSelectedString() {
       return this.selected.length === 0 ? '' : `${this.selected.length} record${this.selected.length > 1 ? 's' : ''} selected of ${this.data.length}`
     },

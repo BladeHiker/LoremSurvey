@@ -72,14 +72,15 @@ export default {
       this.loading = true
       this.loginForm.password = this.$md5(this.loginForm.password)
       login(this.loginForm).then(res => {
-        //登陆成功
-        // this.$router.push('manage')
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
-        this.loginForm.password = ""
+        if (res.data.code === 0) {
+          //登陆成功
+          this.loading = false
+          this.$router.replace('manage')
+        } else {
+          this.loading = false
+          this.loginForm.password = ""
+        }
       })
-
     }
   },
 };

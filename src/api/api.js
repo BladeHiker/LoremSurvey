@@ -1,8 +1,8 @@
-import {service, URL_Prefix} from "src/utils/request";
+import service from "src/utils/request";
 
 export const getSurvey = (data) => {
   return service({
-    url: URL_Prefix + "/question/answer",
+    url: "/api/question/answer",
     method: 'get',
     params: data
   })
@@ -11,7 +11,7 @@ export const getSurvey = (data) => {
 
 export const submitSurvey = (data) => {
   return service({
-    url: URL_Prefix + "/question/answer",
+    url: "/api/question/answer",
     method: 'post',
     data
   })
@@ -19,14 +19,14 @@ export const submitSurvey = (data) => {
 
 export const login = (data) => {
   return service({
-    url: URL_Prefix + "/user/login",
+    url: "/api/user/login",
     method: 'post',
     data
   })
 }
 export const register = (data) => {
   return service({
-    url: URL_Prefix + "/user/register",
+    url: "/api/user/register",
     method: 'post',
     data
   })
@@ -34,7 +34,7 @@ export const register = (data) => {
 
 export const logout = (data) => {
   return service({
-    url: URL_Prefix + "/user/logout",
+    url: "/api/user/logout",
     method: 'post',
     data
   })

@@ -1,4 +1,4 @@
-import {service, URL_Prefix} from "src/utils/request";
+import service from "src/utils/request";
 
 
 // @Tags respondents
@@ -10,7 +10,7 @@ import {service, URL_Prefix} from "src/utils/request";
 
 export const getRespondentList = (data) => {
   return service({
-    url: URL_Prefix + "question/respondents",
+    url: "/api/question/respondents",
     method: 'get',
     data
   })
@@ -25,7 +25,7 @@ export const getRespondentList = (data) => {
 
 export const deleteRespondents = (data) => {
   return service({
-    url: URL_Prefix + "question/respondents",
+    url: "/api/question/respondents",
     method: 'delete',
     data
   })

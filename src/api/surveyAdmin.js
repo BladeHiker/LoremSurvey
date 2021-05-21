@@ -1,4 +1,4 @@
-import {service, URL_Prefix} from '@/utils/request'
+import service from '@/utils/request'
 
 // @Tags survey
 // @Summary 添加问卷
@@ -16,7 +16,7 @@ import {service, URL_Prefix} from '@/utils/request'
 // }
 export const createSurveyItem = (data) => {
   return service({
-    url: URL_Prefix + "question/manage",
+    url: "/api/question/manage",
     method: 'post',
     data
   })
@@ -39,7 +39,7 @@ export const createSurveyItem = (data) => {
 // }
 export const modifySurveyItem = (data) => {
   return service({
-    url: URL_Prefix + "question/manage",
+    url: "/api/question/manage",
     method: 'put',
     data
   })
@@ -62,7 +62,7 @@ export const modifySurveyItem = (data) => {
 // }
 export const getSurveyList = (data) => {
   return service({
-    url: URL_Prefix + "question/manage",
+    url: "/api/question/manage",
     method: 'get',
     data
   })
@@ -90,7 +90,7 @@ export const getSurveyList = (data) => {
 // }
 export const getSurveyItem = (data) => {
   return service({
-    url: URL_Prefix + "question/manage",
+    url: "/api/question/manage",
     method: 'get',
     params: data
   })
@@ -105,7 +105,7 @@ export const getSurveyItem = (data) => {
 // {id : 1}
 export const deleteSurveyItem = (data) => {
   return service({
-    url: URL_Prefix + "question/manage",
+    url: "/api/question/manage",
     method: 'delete',
     data: data
   })
@@ -120,7 +120,7 @@ export const deleteSurveyItem = (data) => {
 // {id : 1}
 export const getSurveyRespondentList = (data) => {
   return service({
-    url: URL_Prefix + "question/generate",
+    url: "/api/question/generate",
     method: 'get',
     params: data
   })
@@ -135,7 +135,7 @@ export const getSurveyRespondentList = (data) => {
 // {id : 1, userlist:[]}
 export const sendSurveyToRespondents = (data) => {
   return service({
-    url: URL_Prefix + "question/generate",
+    url: "/api/question/generate",
     method: 'post',
     data
   })

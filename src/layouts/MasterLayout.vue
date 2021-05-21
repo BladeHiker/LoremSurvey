@@ -5,14 +5,14 @@
         <q-ajax-bar
           ref="bar"
           position="top"
-          color="accent"
-          size="2px"
+          color="#F0AE03"
+          size="3px"
         />
         <q-toolbar-title>
           <q-btn flat size="20px" no-caps padding="8px 5px" @click="goHome">LoremSurvey</q-btn>
           <span class="version"> v0.3 <span>开发版本</span></span>
         </q-toolbar-title>
-        <q-btn-dropdown :label="isLogin? userName:'未登录'" icon="account_circle" flat size="15px" padding="12px">
+        <q-btn-dropdown no-caps :label="isLogin? userName:'未登录'" icon="account_circle" flat size="15px" padding="12px">
           <q-list>
             <q-item clickable v-close-popup v-if="!isLogin">
               <q-item-section>
@@ -61,13 +61,19 @@ export default {
       userName: null
     }
   },
+  updated() {
+    if (this.$cookies.isKey('username')) {
+      this.userName = this.$cookies.get('username')
+      this.isLogin = true
+    } else
+      this.isLogin = false
+  },
   created() {
     if (this.$cookies.isKey('username')) {
       this.userName = this.$cookies.get('username')
       this.isLogin = true
     } else
       this.isLogin = false
-
   },
   methods: {
     goHome() {
@@ -80,6 +86,7 @@ export default {
       this.$cookies.remove('username')
       logout()
       this.isLogin = false
+      location.reload()
     }
   }
 }

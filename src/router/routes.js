@@ -4,16 +4,37 @@ const routes = [
     component: () => import('layouts/SurveyLayout.vue'),
     children: [
       {path: '', component: () => import('pages/Blank')},
-      {path: ':token', component: () => import('pages/Survey.vue')},
+      {
+        path: ':token',
+        component: () => import('pages/Survey.vue'),
+        meta: {
+          title: "问卷"
+        }
+      },
     ]
   },
   {
     path: '/',
     component: () => import('layouts/MasterLayout'),
     children: [
-      {path: '', component: () => import('pages/Welcome')},
-      {path: 'login', component: () => import('pages/Login')},
-      {path: 'register', component: () => import('pages/Register')},
+      {
+        path: '', component: () => import('pages/Welcome'),
+        meta: {
+          title: "欢迎 -LoremSurvey"
+        }
+      },
+      {
+        path: 'login', component: () => import('pages/Login'),
+        meta: {
+          title: "登录 -LoremSurvey"
+        }
+      },
+      {
+        path: 'register', component: () => import('pages/Register'),
+        meta: {
+          title: "注册 -LoremSurvey"
+        }
+      },
     ]
   },
   {
@@ -25,10 +46,30 @@ const routes = [
       else next()
     },
     children: [
-      {path: 'edit/:id', component: () => import('pages/Edit')},
-      {path: 'user', component: () => import('pages/User')},
-      {path: 'respondents', component: () => import( 'pages/Respondents')},
-      {path: '', component: () => import('pages/SurveyManager')},
+      {
+        path: 'edit/:id', component: () => import('pages/Edit'),
+        meta: {
+          title: "问卷编辑 -LoremSurvey"
+        }
+      },
+      {
+        path: 'user', component: () => import('pages/User'),
+        meta: {
+          title: "个人中心 -LoremSurvey"
+        }
+      },
+      {
+        path: 'respondents', component: () => import( 'pages/Respondents'),
+        meta: {
+          title: "受访者管理 -LoremSurvey"
+        }
+      },
+      {
+        path: '', component: () => import('pages/SurveyManager'),
+        meta: {
+          title: "问卷管理 -LoremSurvey"
+        }
+      },
       {path: '*', redirect: '/manage'}
     ]
   },

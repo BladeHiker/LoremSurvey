@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex justify-center">
+  <q-page class="flex flex-center">
     <q-form @submit="onRegister"
             autocorrect="off"
             autocapitalize="off"
@@ -117,17 +117,21 @@ export default {
     },
     onRegister() {
       this.loading = true
-      this.registerForm.password = this.$md5(this.registerForm.password)
-      register(this.registerForm).then(res => {
-        if (res.code === 0) {
+      this.isPwd = true
+      this.passwordAgain = this.registerForm.password = this.$md5(this.registerForm.password)
+      register(this.registerForm).then((res) => {
+        if (res.data.code === 0) {
           this.loading = false
           //注册成功
           this.toLogin()
         }
-      }).catch(() => {
         this.loading = false
+      }).catch(err => {
+        console.log(err)
+        this.loading = false
+      }).finally(() => {
+        this.passwordAgain = this.registerForm.password = ""
       })
-
     }
   },
 };

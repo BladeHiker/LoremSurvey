@@ -3,6 +3,7 @@ import md5 from "js-md5"
 import VueCookies from 'vue-cookies'
 import routes from './routes'
 import VueRouter from 'vue-router'
+import {Dialog} from "quasar";
 
 Vue.prototype.$md5 = md5
 Vue.use(VueCookies)
@@ -27,8 +28,14 @@ export default function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     mode: process.env.VUE_ROUTER_MODE,
-    base: process.env.VUE_ROUTER_BASE
-  })
+    base: process.env.VUE_ROUTER_BASE,
 
+  })
+  Router.beforeEach((to, from, next) => {//beforeEach是router的钩子函数，在进入路由前执行
+    if (to.meta.title) {//判断是否有标题
+      document.title = to.meta.title
+    }
+    next()//执行进入路由，如果不写就不会进入目标页
+  })
   return Router
 }
