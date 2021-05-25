@@ -1,6 +1,15 @@
-# LoremSurvey (lorem-survey)
+# LoremSurvey 高校调查问卷管理系统
 
-A Survey System By Lorem.
+前端部分
+
+**2021软件工程团队作业**
+
+## 后端
+[BackEnd](https://github.com/1506607292/LoremSurvey)
+
+## Developers: 
+LoremIpsum Team
+
 
 ## Install the dependencies
 ```bash
