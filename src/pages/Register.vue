@@ -13,7 +13,10 @@
           v-model="registerForm.username"
           maxlength="20"
           lazy-rules
-          :rules="[ val => val && val.length > 0 || '请输入用户名']"
+          :rules="[
+            val => val && val.length > 0 || '请输入用户名',
+            val => val && /^[a-zA-Z0-9_-]{4,16}$/.test(val) || '用户名由4-16位的字母、数字、下划线、减号构成',
+          ]"
         >
           <template v-slot:prepend>
             <q-icon name="account_box"></q-icon>
@@ -54,7 +57,11 @@
           autocomplete="new-password"
           :type="isPwd ? 'password' : 'text'"
           lazy-rules
-          :rules="[ val => val && val.length > 0 || '请输入密码']"
+          :rules="
+          [
+             val => val && val.length > 0 || '请输入密码',
+             val => val && /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/.test(val) || '密码至少包含 数字和英文，长度6-20'
+          ]"
         >
           <template v-slot:prepend>
             <q-icon name="lock"></q-icon>

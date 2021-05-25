@@ -1,6 +1,13 @@
 <template>
   <q-page class="main-con">
-    <div v-if="demoMode || surveyData.statusCode===103">
+    <div v-if="loading" class="flex flex-center text-secondary text-h7">
+      <q-inner-loading showing>
+        <q-spinner-gears size="50px" color="secondary"/>
+        <br>
+        加载中...
+      </q-inner-loading>
+    </div>
+    <div v-else-if="demoMode || surveyData.statusCode===103">
       <div class="paper-header">
         <div class="text-h4 text-center paper-title">{{ demoMode ? sdata.title : surveyData.title }}</div>
         <div class="text-center paper-time" v-if="$route.params.token">ID:{{ $route.params.token }}</div>
@@ -94,16 +101,15 @@
 
       </q-form>
     </div>
-    <div v-else-if="surveyData.statusCode===104" class="flex flex-center text-secondary text-h5">
+    <div v-else-if="surveyData.statusCode===104" class="flex flex-center text-secondary text-h5 q-mt-lg">
       您已提交此问卷
     </div>
-    <div v-else class="flex flex-center text-secondary text-h5">
+    <div v-else class="flex flex-center text-secondary text-h5 q-mt-lg">
       问卷已停止收集
     </div>
     <br>
-    <q-separator/>
-    <div class="paper-footer text-center">
-
+    <q-separator v-if="!loading" class="q-ma-md"/>
+    <div v-if="!loading" class="paper-footer text-center">
       Copyright © 2021 LoremIpsum Team
       <br/>
       问卷系统由<span class="no-wrap">LoremSurvey</span>提供
@@ -131,165 +137,20 @@ export default {
         desc: "",
         problemSet: []
       },
-      // surveyData: {
-      //   "title": "编程学习调研问卷",
-      //   "isopen": "1",
-      //   isrunning: 1,
-      //   "desc": "沈阳航空航天大学 软件工程LoremIpsum Team 调查问卷",
-      //   "stime": "2021/4/1",
-      //   "etime": "2021/6/1",
-      //   "problemSet": [
-      //     {
-      //       "index": 1,
-      //       "type": 1,
-      //       "title": "您目前的职业是?",
-      //       "need": "True",
-      //       "options": [
-      //         {
-      //           "label": "在校学生",
-      //           "value": "1"
-      //         },
-      //         {
-      //           "label": "政府/机关干部/公务员",
-      //           "value": "2"
-      //         },
-      //         {
-      //           "label": "企业管理者（包括基层及中高层管理者）",
-      //           "value": "3"
-      //         },
-      //         {
-      //           "label": "普通职员（办公室 / 写字楼工作人员）",
-      //           "value": "4"
-      //         },
-      //         {
-      //           "label": "专业人员（如医生 / 律师 / 文体 / 记者 / 老师等）",
-      //           "value": "5"
-      //         },
-      //         {
-      //           "label": "普通工人（如工厂工人 / 体力劳动者等）",
-      //           "value": "6"
-      //         },
-      //         {
-      //           "label": "商业服务业职工（如销售人员 / 商店职员 / 服务员等）",
-      //           "value": "7"
-      //         },
-      //         {
-      //           "label": "个体经营者 / 承包商",
-      //           "value": "8"
-      //         },
-      //         {
-      //           "label": "自由职业者",
-      //           "value": "9"
-      //         },
-      //         {
-      //           "label": "农林牧渔劳动者",
-      //           "value": "10"
-      //         },
-      //         {
-      //           "label": "退休",
-      //           "value": "11"
-      //         },
-      //         {
-      //           "label": "暂无职业",
-      //           "value": "12"
-      //         },
-      //         {
-      //           "label": "others",
-      //           "value": "#"
-      //         }
-      //       ]
-      //     },
-      //     {
-      //       "index": 2,
-      //       "type": 1,
-      //       "title": "您学习编程多久了?",
-      //       "need": "True",
-      //       "options": [
-      //         {
-      //           "label": "不到3个月",
-      //           "value": "1"
-      //         },
-      //         {
-      //           "label": "3-6个月",
-      //           "value": "2"
-      //         },
-      //         {
-      //           "label": "6-12个月",
-      //           "value": "3"
-      //         },
-      //         {
-      //           "label": "1-3年以上",
-      //           "value": "4"
-      //         },
-      //         {
-      //           "label": "3年以上",
-      //           "value": "5"
-      //         },
-      //         {
-      //           "label": "others",
-      //           "value": "#"
-      //         }
-      //       ]
-      //     },
-      //     {
-      //       "index": 7,
-      //       "type": 1,
-      //       "title": "您希望订阅我们的信息吗?",
-      //       "need": "False",
-      //       "options": [
-      //         {
-      //           "label": "是",
-      //           "value": "True"
-      //         },
-      //         {
-      //           "label": "否",
-      //           "value": "False"
-      //         },
-      //         {
-      //           "label": "others",
-      //           "value": "#"
-      //         }
-      //       ]
-      //     },
-      //     {
-      //       "index": 3,
-      //       "type": 0,
-      //       "title": "您如何学习编程?",
-      //       "need": "False"
-      //     },
-      //     {
-      //       "index": 4,
-      //       "type": 0,
-      //       "title": "您学习的方向是?",
-      //       "need": "True"
-      //     },
-      //     {
-      //       "index": 5,
-      //       "type": 0,
-      //       "title": "您为什么要学习编程?",
-      //       "need": "True"
-      //     },
-      //     {
-      //       "index": 6,
-      //       "type": 0,
-      //       "title": "您的联系方式?",
-      //       "need": "False"
-      //     }
-      //   ]
-      // },
       answer: {
-        sessionid: null,
         problemSet: []
       },
       submitted: 0,
       res: null,
       sessionId: null,
-      demoMode: false
+      demoMode: false,
+      loading: true
     }
   },
   async created() {
     if (!this.$route.params.token) {
       this.demoMode = true
+      this.loading = false
       return
     }
     //鉴权
@@ -297,12 +158,16 @@ export default {
     const res = await getSurvey({sessionid: this.sessionId})
     this.surveyData = res.data.data
     if (this.surveyData.statusCode === 105) {
-      await this.$router.push("/404")
+      await this.$router.push("/survey")
     }
     if (this.surveyData.statusCode === 103) {
       document.title = this.surveyData.title + " -LoremSurvey"
       if (!this.surveyData.isrunning) this.submitted = 1
-      this.answer.sessionid = this.sessionId
+
+      this.surveyData.problemSet.sort((a, b) => {
+        return a.index > b.index ? 1 : -1
+      })
+
       for (let i = 0; i < this.surveyData.problemSet.length; ++i) {
         if (this.surveyData.problemSet[i].type === 1) {
           //选择题
@@ -313,6 +178,7 @@ export default {
         }
       }
     }
+    this.loading = false
   },
   filters: {
     formatIndex: function (index) {
@@ -328,11 +194,10 @@ export default {
         setTimeout(() => {
           this.submitted = 1
         }, 1000)
-
         return
       }
       this.submitted = -1
-      submitSurvey(this.answer).then((res) => {
+      submitSurvey({sessionid: this.sessionId}, {problemSet: this.answer.problemSet}).then((res) => {
         if (res.data.code === 0) {
           this.submitted = 1
         } else {

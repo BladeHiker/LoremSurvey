@@ -9,10 +9,11 @@ export const getSurvey = (data) => {
 }
 
 
-export const submitSurvey = (data) => {
+export const submitSurvey = (query, data) => {
   return service({
     url: "/api/question/answer",
     method: 'post',
+    params: query,
     data
   })
 }

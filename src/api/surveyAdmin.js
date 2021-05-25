@@ -140,3 +140,32 @@ export const sendSurveyToRespondents = (data) => {
     data
   })
 }
+
+// @Tags survey
+// @Summary 获取开发问卷链接
+// @accept application/json
+// @Produce application/json
+// @Success 200 {string} json "{"success":true,"data":{},"msg":""}"
+// @Router question/manage [delete]
+export const getOpenSurveyLink = (data) => {
+  return service({
+    url: "/api/question/generate",
+    method: 'post',
+    data
+  })
+}
+
+// @Tags survey
+// @Summary 发送问卷
+// @accept application/json
+// @Produce application/json
+// @Success 200 {string} json "{"success":true,"data":{},"msg":""}"
+// @Router question/manage [delete]
+export const getSurveyResult = (data) => {
+  return service({
+    url: "/api/question/result",
+    method: 'get',
+    params: data
+  })
+}
+

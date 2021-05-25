@@ -77,9 +77,12 @@ export default {
           this.loading = false
           this.$router.replace('manage')
         } else {
-          this.loading = false
           this.loginForm.password = ""
         }
+        this.loading = false
+      }).catch(() => {
+        this.loginForm.password = ""
+        this.loading = false
       })
     }
   },

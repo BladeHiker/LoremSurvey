@@ -10,7 +10,7 @@
         />
         <q-toolbar-title>
           <q-btn flat size="20px" no-caps padding="8px 5px" @click="goHome">LoremSurvey</q-btn>
-          <span class="version"> v0.3 <span>开发版本</span></span>
+          <span class="version"> v1.0 <span>内部评估版本</span></span>
         </q-toolbar-title>
         <q-btn-dropdown no-caps :label="isLogin? userName:'未登录'" icon="account_circle" flat size="15px" padding="12px">
           <q-list>
