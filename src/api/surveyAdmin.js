@@ -7,10 +7,10 @@ import service from '@/utils/request'
 // @Success 200 {string} json "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router question/manage [post]
 // {
-//    isopen int
+//    open int
 //    title string
-//    stime string
-//    etime string
+//    startTime string
+//    stopTime string
 //    desc string
 //    problemSet {}
 // }
@@ -30,10 +30,10 @@ export const createSurveyItem = (data) => {
 // @Router question/manage [put]
 // {
 //    id int
-//    isopen int
+//    open int
 //    title string
-//    stime string
-//    etime string
+//    startTime string
+//    stopTime string
 //    desc string
 //    problemSet {}
 // }
@@ -55,9 +55,9 @@ export const modifySurveyItem = (data) => {
 //   "id": 1,
 //   "title": "编程学习问卷",
 //   "desc": "沈阳航空航天大学 软件工程LoremIpsum Team 调查问卷",
-//   "stime": "2021-04-01T00:00:00Z",
-//   "etime": "2021-06-01T00:00:00Z",
-//   "isopen": "1",
+//   "startTime": "2021-04-01T00:00:00Z",
+//   "stopTime": "2021-06-01T00:00:00Z",
+//   "open": "1",
 //   "status": "0" //1 已经结束 0正在进行 -1还未开始
 // }
 export const getSurveyList = (data) => {
@@ -79,10 +79,10 @@ export const getSurveyList = (data) => {
 //   "code": 0,
 //   "data": {
 //   "title": "编程学习调研问卷close",
-//     "isopen": "0",
+//     "open": "0",
 //     "desc": "沈阳航空航天大学 软件工程LoremIpsum Team 调查问卷",
-//     "stime": "2021-05-01T00:00:00Z",
-//     "etime": "2021-08-01T00:00:00Z",
+//     "startTime": "2021-05-01T00:00:00Z",
+//     "stopTime": "2021-08-01T00:00:00Z",
 //     "problemSet": [
 //   ]
 // },
@@ -132,7 +132,7 @@ export const getSurveyRespondentList = (data) => {
 // @Produce application/json
 // @Success 200 {string} json "{"success":true,"data":{},"msg":""}"
 // @Router question/manage [delete]
-// {id : 1, userlist:[]}
+// {id : 1, userList:[]}
 export const sendSurveyToRespondents = (data) => {
   return service({
     url: "/api/question/generate",

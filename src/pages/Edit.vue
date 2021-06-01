@@ -131,7 +131,8 @@
                           <q-item-section>
                             <div>
                               <q-chip dense square>{{ i + 1 }}</q-chip>
-                              <input v-model="item.label" class="input-option" placeholder="输入选项"/>
+                              <input v-model="item.label" @change="item.value=item.label" class="input-option"
+                                     placeholder="输入选项"/>
                             </div>
                           </q-item-section>
                           <q-item-section side>
@@ -145,12 +146,13 @@
                           </q-item-section>
                         </q-item>
                         <q-separator/>
-                        <q-item>
+                        <q-item style="border: 2px black solid;border-radius: 0 0 4px 4px">
                           <q-item-section>
                             <div>
                               <q-icon size="12px" style="width: 25px" name="create"/>
-                              <input v-model="templateOptions.label" class="input-option add-option"
-                                     placeholder="添加选项" @submit="addOption(pid)"/>
+                              <input autofocus="autofocus" v-model="templateOptions.label"
+                                     class="input-option add-option"
+                                     placeholder="添加选项" @keyup.enter="addOption(pid)"/>
                             </div>
                           </q-item-section>
                           <q-item-section side>
@@ -179,7 +181,7 @@
       </q-tab-panel>
       <q-tab-panel name="send" class="column">
         <div style="max-width: calc(100vw - 32px);">
-          <q-banner v-if="!surveyData.isrunning" class="bg-grey-3" rounded style="margin-bottom: 10px">
+          <q-banner v-if="!surveyData.running" class="bg-grey-3" rounded style="margin-bottom: 10px">
             <template v-slot:avatar>
               <q-icon name="speaker_notes_off" color="primary"/>
             </template>
@@ -188,7 +190,7 @@
               <q-btn flat color="primary" @click="tab='setting'" label="改变问卷设置"/>
             </template>
           </q-banner>
-          <q-banner v-if="!surveyData.isopen" class="bg-primary text-white" rounded>
+          <q-banner v-if="!surveyData.open" class="bg-primary text-white" rounded>
             <template v-slot:avatar>
               <q-icon name="group_add"/>
             </template>
@@ -245,12 +247,12 @@
                 <q-card>
                   <q-card-section horizontal class="flex row flex-center justify-around q-pa-md">
                     <q-card-section class="flex flex-center column">
-                      <div class="text-h5 text-blue-7">{{ resultData.total }}</div>
+                      <div class="text-h5 text-blue-7">{{ resultData.frequency ? resultData.frequency : '-' }}</div>
                       <div>已收集问卷</div>
                     </q-card-section>
                     <q-card-section class="flex flex-center column">
-                      <div class="text-h5 text-blue-7" v-if="surveyData.isrunning">
-                        {{ surveyData.isopen ? '开放收集中' : "定向收集中" }}
+                      <div class="text-h5 text-blue-7" v-if="surveyData.running">
+                        {{ surveyData.open ? '开放收集中' : "定向收集中" }}
                       </div>
                       <div class="text-h5 text-brown-5" v-else>
                         停止收集
@@ -261,7 +263,7 @@
                 </q-card>
               </div>
               <div class="column">
-                <div v-for="(problem,pid) in resultData.question" :key="pid" class="ques-section">
+                <div v-for="(problem,pid) in resultData.problemSet" :key="pid" class="ques-section">
                   <div v-if="problem.type===0">
                     <div>
                       <div class="text-h6 ques-title-large">
@@ -271,15 +273,15 @@
                         <span v-if="problem.need" class="text-red"> *</span>
                       </div>
                       <q-list bordered separator>
-                        <q-item v-for="(option,i) in problem.answers" :key="i">
-                          <q-item-section>{{ i }}</q-item-section>
+                        <q-item v-for="(ans,cnt) in problem.answer" :key="ans">
+                          <q-item-section>{{ ans }}</q-item-section>
                           <q-item-section side>
                             <div class="text-grey-8 q-gutter-xs">
-                              {{ option }}
+                              {{ cnt }}
                             </div>
                           </q-item-section>
                         </q-item>
-                        <q-item v-if="problem.total===0">
+                        <q-item v-if="!problem.frequency || problem.frequency===0">
                           <div class="q-ma-sm">
                             <q-icon name="warning"/>
                             <span>&nbsp;&nbsp;暂无作答</span>
@@ -298,18 +300,18 @@
                         <span v-if="problem.need" class="text-red"> *</span>
                       </div>
                       <q-list bordered separator>
-                        <q-item v-for="(option,i) in problem.option" :key="i">
+                        <q-item v-for="(option,i) in problem.options" :key="i">
                           <q-item-section>
-                            {{ i }}
-                            <q-linear-progress :value="problem.total? option/problem.total:0"/>
+                            {{ option.label }}
+                            <q-linear-progress :value="problem.frequency? option.frequency/problem.frequency:0"/>
                           </q-item-section>
                           <q-item-section side>
                             <div class="text-grey-8 q-gutter-xs">
-                              {{ option }}
+                              {{ option.frequency }}
                             </div>
                           </q-item-section>
                         </q-item>
-                        <q-item v-if="problem.option.length===0">
+                        <q-item v-if="problem.options.length===0">
                           <div class="q-ma-sm">
                             <q-icon name="warning"/>
                             <span>&nbsp;&nbsp;未设置选项</span>
@@ -328,25 +330,25 @@
         <div class="flex justify-center">
           <q-list bordered separator class="san-grail">
             <q-item>
-              <q-item-section>{{ surveyData.isrunning ? '允许作答' : '停止收集问卷' }}</q-item-section>
+              <q-item-section>{{ surveyData.running ? '允许作答' : '停止收集问卷' }}</q-item-section>
               <q-item-section side>
                 <div class="text-grey-8 q-gutter-xs">
-                  <q-toggle v-model="surveyData.isrunning" @input="onSave"/>
+                  <q-toggle v-model="surveyData.running" @input="onSave"/>
                 </div>
               </q-item-section>
             </q-item>
             <q-item>
-              <q-item-section>{{ surveyData.isopen ? "开放问卷 (收到链接者均可作答)" : "定向问卷 (仅受邀用户可以作答)" }}</q-item-section>
+              <q-item-section>{{ surveyData.open ? "开放问卷 (收到链接者均可作答)" : "定向问卷 (仅受邀用户可以作答)" }}</q-item-section>
               <q-item-section side>
                 <div class="text-grey-8 q-gutter-xs">
-                  <q-toggle v-model="surveyData.isopen" @input="onSave"/>
+                  <q-toggle v-model="surveyData.open" @input="onSave"/>
                 </div>
               </q-item-section>
             </q-item>
             <q-item v-if="false">
               <q-item-section>开放时间</q-item-section>
-              <q-item-section v-if="surveyData.stime">
-                <q-input filled v-model="surveyData.stime">
+              <q-item-section v-if="surveyData.startTime">
+                <q-input filled v-model="surveyData.startTime">
                   <template v-slot:prepend>
                     <q-icon name="event" class="cursor-pointer">
                       <q-popup-proxy transition-show="scale" transition-hide="scale">
@@ -374,7 +376,7 @@
               </q-item-section>
               <q-item-section side>
                 <div class="text-grey-8 q-gutter-xs">
-                  <q-toggle v-model="stimeEnable" @click="switchStime" @input="onSave"/>
+                  <q-toggle v-model="startTimeEnable" @click="switchStime" @input="onSave"/>
 
                 </div>
               </q-item-section>
@@ -453,8 +455,13 @@ export default {
       isEditing: false,
       openLink: null,
       resultData: {
-        total: '-',
-        question: []
+        frequency: '-',
+        problemSet: [],
+        desc: "",
+        id: "",
+        open: null,
+        respondent_ids: [],
+        startTime: null
       }
     }
   },
@@ -471,15 +478,15 @@ export default {
     }
   },
   computed: {
-    stimeEnable() {
-      return this.surveyData.stime !== null
+    startTimeEnable() {
+      return this.surveyData.startTime !== null
     }
   },
   methods: {
     async getResponse() {
       const res = await getSurveyResult({id: this.id})
       this.resultData = res.data.data
-      this.resultData.question.sort((a, b) => {
+      this.resultData.problemSet.sort((a, b) => {
         return a.index > b.index ? 1 : -1
       })
     },
@@ -548,7 +555,7 @@ export default {
     addOption(pid) {
       this.surveyData.problemSet[pid].options.push({
         label: this.templateOptions.label,
-        value: this.surveyData.problemSet[pid].options.length + 1
+        value: this.templateOptions.label
       })
       this.templateOptions.label = ""
     }
@@ -592,8 +599,8 @@ export default {
     async getRespondentList() {
       const res = await getSurveyRespondentList({id: this.id})
       this.respondentData = res.data.data
-      if (this.surveyData.isopen) {
-        const link = await getOpenSurveyLink({id: this.id, userlist: []})
+      if (this.surveyData.open) {
+        const link = await getOpenSurveyLink({id: this.id, userList: []})
         this.openLink = link.data.data.link
       }
     }
@@ -614,9 +621,10 @@ export default {
       this.editing = -1
       this.surveyData.id = this.id
       modifySurveyItem(this.surveyData).then(res => {
-        if (res.data.code === 0) {
+        if (res && res.data && res.data.code === 0) {
           this.isEditing = false
           Notify.create({message: "保存成功", color: 'secondary', position: 'top', timeout: 1500})
+          this.getSurveyData()
         }
       })
     }
@@ -626,7 +634,7 @@ export default {
       for (let i = 0; i < this.selected.length; i++) {
         sendList.push(this.selected[i].id)
       }
-      sendSurveyToRespondents({id: this.id, userlist: sendList}).then(() => {
+      sendSurveyToRespondents({id: this.id, userList: sendList}).then(() => {
         Notify.create({message: "发送成功", color: 'secondary', position: 'top', timeout: 1500})
         this.getRespondentList()
       })
@@ -673,7 +681,7 @@ export default {
 .input-option {
   border: none;
   outline: none;
-  width: calc(100% - 30px);
+  width: calc(100% - 40px);
   border-bottom: #1976D2 dashed 1px;
 }
 

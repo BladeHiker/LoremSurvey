@@ -40,3 +40,12 @@ export const logout = (data) => {
     data
   })
 }
+
+export const getCaptcha = (data) => {
+  return service({
+    url: "/api/user/getcaptcha",
+    method: 'get',
+    data
+  })
+}
+

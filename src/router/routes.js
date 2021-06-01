@@ -35,6 +35,12 @@ const routes = [
           title: "注册 -LoremSurvey"
         }
       },
+      {
+        path: 'forget', component: () => import('pages/Forget'),
+        meta: {
+          title: "找回密码 -LoremSurvey"
+        }
+      },
     ]
   },
   {

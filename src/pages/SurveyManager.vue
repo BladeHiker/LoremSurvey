@@ -22,11 +22,11 @@
             <div class="text-h6">
               <div>{{ item.title }}</div>
               <div class="text-subtitle2">
-                {{ item.isopen ? '开放问卷' : "定向问卷" }}
+                {{ item.open ? '开放问卷' : "定向问卷" }}
               </div>
             </div>
 
-            <div class="text-subtitle2" v-if="item.isrunning">
+            <div class="text-subtitle2" v-if="item.running">
               <q-icon name="fiber_manual_record" color="light-green"></q-icon>
               收集中
             </div>
@@ -78,11 +78,11 @@ export default {
     },
     onCreateSurvey() {
       createSurveyItem({
-        isopen: false,
-        isrunning: false,
+        open: false,
+        running: false,
         title: "无标题问卷",
-        stime: null,
-        etime: null,
+        startTime: null,
+        stopTime: null,
         desc: "",
         problemSet: [],
         emailTemplate: ""

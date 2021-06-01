@@ -45,6 +45,8 @@ service.interceptors.response.use(
       case 7:
         Notify.create({message: response.data.message.toString(), color: 'warning', position: 'top', timeout: 1500})
         return response
+      default:
+        return response
     }
   },
   error => {

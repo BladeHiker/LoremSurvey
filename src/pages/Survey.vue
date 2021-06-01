@@ -74,14 +74,14 @@
             </q-field>
             <q-field
               v-else
-              v-model="answer.problemSet[i].option"
+              v-model="answer.problemSet[i].answer"
               :rules="[val => !problem.need||val!=null||'必填项']"
               borderless
               :disable="submitted===1"
             >
               <template v-slot:control>
                 <q-option-group
-                  v-model="answer.problemSet[i].option"
+                  v-model="answer.problemSet[i].answer"
                   :options="problem.options"
                   color="primary"
                   type="radio"
@@ -162,7 +162,7 @@ export default {
     }
     if (this.surveyData.statusCode === 103) {
       document.title = this.surveyData.title + " -LoremSurvey"
-      if (!this.surveyData.isrunning) this.submitted = 1
+      if (!this.surveyData.running) this.submitted = 1
 
       this.surveyData.problemSet.sort((a, b) => {
         return a.index > b.index ? 1 : -1
@@ -171,10 +171,10 @@ export default {
       for (let i = 0; i < this.surveyData.problemSet.length; ++i) {
         if (this.surveyData.problemSet[i].type === 1) {
           //选择题
-          this.answer.problemSet.push({index: i + 1, option: null})
+          this.answer.problemSet.push({index: i + 1, answer: null, id: this.surveyData.problemSet[i].id})
         } else if (this.surveyData.problemSet[i].type === 0) {
           //填空题
-          this.answer.problemSet.push({index: i + 1, answer: null})
+          this.answer.problemSet.push({index: i + 1, answer: null, id: this.surveyData.problemSet[i].id})
         }
       }
     }

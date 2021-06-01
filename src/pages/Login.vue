@@ -34,9 +34,25 @@
             />
           </template>
         </q-input>
+        <q-input
+          label="验证码"
+          v-model="loginForm.captcha.code"
+          maxlength="20"
+          lazy-rules
+          :rules="[ val => val && val.length > 0 || '请输入验证码']"
+        >
+          <template v-slot:prepend>
+            <q-icon name="how_to_reg"></q-icon>
+          </template>
+          <template v-slot:after>
+            <q-img style="cursor: pointer" @click="getCaptchaData" :src="'data:image/png;base64,'+captchaImg"
+                   width="100px" height="50px">
+            </q-img>
+          </template>
+        </q-input>
         <q-btn color="primary" type="submit" label="登录" :loading="loading"/>
         <div class="text-center">
-          <q-btn flat dense>找回密码</q-btn>
+          <q-btn flat dense @click="toForget">找回密码</q-btn>
           &nbsp;
           <q-btn flat dense @click="toReg">注册新账号</q-btn>
         </div>
@@ -47,7 +63,7 @@
 
 <script>
 
-import {login} from "src/api/api";
+import {getCaptcha, login} from "src/api/api";
 
 export default {
   name: "Login",
@@ -57,16 +73,31 @@ export default {
       loginForm: {
         username: "",
         password: "",
+        captcha: {
+          code: "",
+          id: "",
+        }
       },
-      loading: false
+      loading: false,
+      captchaImg: null
     };
   },
   created() {
-
+    this.getCaptchaData()
   },
   methods: {
+    getCaptchaData() {
+      getCaptcha().then(res => {
+        this.loginForm.captcha.code = ""
+        this.loginForm.captcha.id = res.data.data.id
+        this.captchaImg = res.data.data.base64Data
+      })
+    },
     toReg() {
       this.$router.push('register')
+    },
+    toForget() {
+      this.$router.push('forget')
     },
     onLogin() {
       this.loading = true
@@ -78,10 +109,12 @@ export default {
           this.$router.replace('manage')
         } else {
           this.loginForm.password = ""
+          this.getCaptchaData()
         }
         this.loading = false
       }).catch(() => {
         this.loginForm.password = ""
+        this.getCaptchaData()
         this.loading = false
       })
     }
