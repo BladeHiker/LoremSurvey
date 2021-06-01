@@ -1,29 +1,31 @@
 <template>
   <div>
-    <q-toolbar class="bg-blue-grey-1 flex flex-center text-teal">
-      <q-icon name="description"/>
-      &nbsp;
-      <div class="text-weight-bold edit-title" v-if="surveyData.title!==''">
-        {{ surveyData.title }}
-      </div>
-      <div class="text-weight-bold edit-title" v-else>
-        <i>无标题问卷</i>
-      </div>
-      <span v-if="isEditing"> &nbsp;-&nbsp;正在编辑</span>
-      <span v-else> &nbsp;-&nbsp;已保存</span>
-    </q-toolbar>
-    <q-tabs
-      v-model="tab"
-      class="text-teal shadow-2 bg-grey-1"
-      shrink
-      stretch
-      inline-label
-    >
-      <q-route-tab :to="{ }" name="edit" icon="edit" label="编辑"/>
-      <q-route-tab :to="{ query: { tab: '2' } }" name="send" icon="share" label="发布"/>
-      <q-route-tab :to="{ query: { tab: '3' } }" name="response" icon="equalizer" label="结果"/>
-      <q-route-tab :to="{ query: { tab: '4' } }" name="setting" icon="settings" label="设置"/>
-    </q-tabs>
+    <!--    <q-toolbar class="bg-blue-grey-1 flex flex-center text-teal">-->
+    <!--      <q-icon name="description"/>-->
+    <!--      &nbsp;-->
+    <!--      <div class="text-weight-bold edit-title" v-if="surveyData.title!==''">-->
+    <!--        {{ surveyData.title }}-->
+    <!--      </div>-->
+    <!--      <div class="text-weight-bold edit-title" v-else>-->
+    <!--        <i>无标题问卷</i>-->
+    <!--      </div>-->
+    <!--      <span v-if="isEditing"> &nbsp;-&nbsp;正在编辑</span>-->
+    <!--      <span v-else> &nbsp;-&nbsp;已保存</span>-->
+    <!--    </q-toolbar>-->
+    <q-footer v-show="!paperSimulate" elevated>
+      <q-tabs
+        v-model="tab"
+        class="shadow-2 bg-primary"
+        shrink
+        stretch
+        inline-label
+      >
+        <q-route-tab :to="{ }" name="edit" icon="edit" label="编辑"/>
+        <q-route-tab :to="{ query: { tab: '2' } }" name="send" icon="share" label="发布"/>
+        <q-route-tab :to="{ query: { tab: '3' } }" name="response" icon="equalizer" label="结果"/>
+        <q-route-tab :to="{ query: { tab: '4' } }" name="setting" icon="settings" label="设置"/>
+      </q-tabs>
+    </q-footer>
     <q-tab-panels v-model="tab" @transition="prepareData" animated>
       <q-tab-panel name="edit" class="column">
         <div class="column flex-center">
@@ -49,135 +51,140 @@
                 </div>
               </div>
               <div class="column">
-                <div v-for="(problem,pid) in surveyData.problemSet" :key="pid" class="ques-section">
-                  <div v-if="problem.type===0">
-                    <div v-if="editing!==pid" @click="editing=pid;isEditing=true" class="editable">
-                      <div class="text-h6 ques-title-large">
-                        <b>{{ pid + 1|formatIndex }} / </b>
-                        <span v-if="problem.title!==''">{{ problem.title }}</span>
-                        <span v-else class="text-green-5"><i>点击编辑问题</i></span>
-                        <span v-if="problem.need" class="text-red"> *</span>
-                      </div>
-                      <q-input placeholder="请输入"
-                               :dense="true"
-                               filled
-                               v-model="answer[pid]"
-                      />
-                    </div>
-                    <div v-if="editing===pid">
-                      <div class="text-h6 ques-title-large">
-                        <b>{{ pid + 1|formatIndex }} / </b>
-                        <input v-model="problem.title" placeholder="输入问题" minlength="1" maxlength="128"
-                               class="input-title"/>
-                        <span v-if="problem.need" class="text-red"> *</span>
-                        <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
-                          <q-toggle label="必填项" dense v-model="problem.need"/>
-                          <q-btn flat dense icon="arrow_upward" label="上移" @click="upProblem(pid)"/>
-                          <q-btn flat dense icon="arrow_downward" label="下移" @click="downProblem(pid)"/>
-                          <q-btn flat dense icon="close" label="删除" @click="delProblem(pid)"/>
-                          <q-btn flat dense icon="check" label="完成" @click="editing=-1"/>
+                <transition-group name="fade">
+                  <div v-for="(problem,pid) in surveyData.problemSet" :key="problem.title+pid" class="ques-section">
+                    <div v-if="problem.type===0">
+                      <div v-if="editing!==pid" @click="editing=pid;isEditing=true" class="editable">
+                        <div class="text-h6 ques-title-large">
+                          <b>{{ pid + 1|formatIndex }} / </b>
+                          <span v-if="problem.title!==''">{{ problem.title }}</span>
+                          <span v-else class="text-green-5"><i>点击编辑问题</i></span>
+                          <span v-if="problem.need" class="text-red"> *</span>
                         </div>
+                        <q-input placeholder="请输入"
+                                 :dense="true"
+                                 filled
+                                 v-model="answer[pid]"
+                        />
                       </div>
-                    </div>
-
-                  </div>
-                  <div v-else-if="problem.type===1">
-                    <div class="editable" @click="editing=pid;isEditing=true" v-if="editing!==pid">
-                      <div class="text-h6 ques-title">
-                        <b>{{ pid + 1 |formatIndex }} / </b>
-                        <span v-if="problem.title!==''">{{ problem.title }}</span>
-                        <span v-else class="text-green-5"><i>点击编辑问题</i></span>
-                        <span v-if="problem.need" class="text-red"> *</span>
-                      </div>
-                      <q-field
-                        borderless
-                        v-model="answer[pid]"
-                      >
-                        <template v-slot:control>
-                          <q-option-group
-                            :options="problem.options"
-                            color="primary"
-                            type="radio"
-                            v-model="answer[pid]"
-                            @input="answer[pid]=null"
-                          />
-                        </template>
-                      </q-field>
-                    </div>
-                    <div v-else>
-                      <div class="text-h6 ques-title">
-                        <b>{{ pid + 1 |formatIndex }} / </b>
-                        <input v-model="problem.title" placeholder="输入问题" minlength="1" maxlength="128"
-                               class="input-title"/>
-                        <span v-if="problem.need" class="text-red"> *</span>
-                        <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
-                          <q-toggle label="必填项" dense v-model="problem.need"/>
-                          <q-btn flat dense icon="arrow_upward" label="上移" @click="upProblem(pid)"/>
-                          <q-btn flat dense icon="arrow_downward" label="下移" @click="downProblem(pid)"/>
-                          <q-btn flat dense icon="close" label="删除" @click="delProblem(pid)"/>
-                          <q-btn flat dense icon="check" label="完成" @click="editing=-1"/>
-                        </div>
-                      </div>
-                      <q-list bordered class="rounded-borders">
-                        <q-item-label header>选项列表</q-item-label>
-                        <q-separator/>
-                        <q-item v-if="problem.options.length===0">
-                          <div class="q-ma-sm">
-                            <q-icon name="warning"/>
-                            <span>&nbsp;请添加选项</span>
+                      <div v-if="editing===pid">
+                        <div class="text-h6 ques-title-large">
+                          <b>{{ pid + 1|formatIndex }} / </b>
+                          <input v-model="problem.title" placeholder="输入问题" minlength="1" maxlength="128"
+                                 class="input-title"/>
+                          <span v-if="problem.need" class="text-red"> *</span>
+                          <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
+                            <q-toggle label="必填项" dense v-model="problem.need"/>
+                            <q-btn flat dense icon="arrow_upward" label="上移" @click="upProblem(pid)"/>
+                            <q-btn flat dense icon="arrow_downward" label="下移" @click="downProblem(pid)"/>
+                            <q-btn flat dense icon="close" label="删除" @click="delProblem(pid)"/>
+                            <q-btn flat dense icon="check" label="完成" @click="editing=-1"/>
                           </div>
-                        </q-item>
-                        <q-item v-for="(item,i) in problem.options" :key="i">
-                          <q-item-section>
-                            <div>
-                              <q-chip dense square>{{ i + 1 }}</q-chip>
-                              <input v-model="item.label" @change="item.value=item.label" class="input-option"
-                                     placeholder="输入选项"/>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div v-else-if="problem.type===1">
+                      <div class="editable" @click="editing=pid;isEditing=true;onAddOption=pid" v-if="editing!==pid">
+                        <div class="text-h6 ques-title">
+                          <b>{{ pid + 1 |formatIndex }} / </b>
+                          <span v-if="problem.title!==''">{{ problem.title }}</span>
+                          <span v-else class="text-green-5"><i>点击编辑问题</i></span>
+                          <span v-if="problem.need" class="text-red"> *</span>
+                        </div>
+                        <q-field
+                          borderless
+                          v-model="answer[pid]"
+                        >
+                          <template v-slot:control>
+                            <q-option-group
+                              :options="problem.options"
+                              color="primary"
+                              type="radio"
+                              v-model="answer[pid]"
+                              @input="answer[pid]=null"
+                            />
+                          </template>
+                        </q-field>
+                      </div>
+                      <div v-else>
+                        <div class="text-h6 ques-title">
+                          <b>{{ pid + 1 |formatIndex }} / </b>
+                          <input v-model="problem.title" placeholder="输入问题" minlength="1" maxlength="128"
+                                 class="input-title"/>
+                          <span v-if="problem.need" class="text-red"> *</span>
+                          <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
+                            <q-toggle label="必填项" dense v-model="problem.need"/>
+                            <q-btn flat dense icon="arrow_upward" label="上移" @click="upProblem(pid)"/>
+                            <q-btn flat dense icon="arrow_downward" label="下移" @click="downProblem(pid)"/>
+                            <q-btn flat dense icon="close" label="删除" @click="delProblem(pid)"/>
+                            <q-btn flat dense icon="check" label="完成" @click="editing=-1"/>
+                          </div>
+                        </div>
+                        <q-list bordered>
+                          <q-item-label header>选项列表</q-item-label>
+                          <q-separator/>
+                          <q-item v-if="problem.options.length===0">
+                            <div class="q-ma-sm">
+                              <q-icon name="warning"/>
+                              <span>&nbsp;请添加选项</span>
                             </div>
-                          </q-item-section>
-                          <q-item-section side>
-                            <div class="text-grey-8 q-gutter-xs">
-                              <q-btn style="display: inline !important;" class="gt-xs" size="12px" flat dense
-                                     icon="delete"
-                                     @click="delOption(pid,i)"/>
-                              <q-btn size="12px" flat dense icon="arrow_upward" @click="upOption(pid,i)"/>
-                              <q-btn size="12px" flat dense icon="arrow_downward" @click="downOption(pid,i)"/>
-                            </div>
-                          </q-item-section>
-                        </q-item>
-                        <q-separator/>
-                        <q-item style="border: 2px black solid;border-radius: 0 0 4px 4px">
-                          <q-item-section>
-                            <div>
-                              <q-icon size="12px" style="width: 25px" name="create"/>
-                              <input autofocus="autofocus" v-model="templateOptions.label"
-                                     class="input-option add-option"
-                                     placeholder="添加选项" @keyup.enter="addOption(pid)"/>
-                            </div>
-                          </q-item-section>
-                          <q-item-section side>
-                            <div class="text-grey-8 q-gutter-xs">
-                              <q-btn class="gt-xs" style="display: inline !important;" size="12px" flat dense round
-                                     icon="add" @click="addOption(pid)"/>
-                            </div>
-                          </q-item-section>
-                        </q-item>
-                      </q-list>
+                          </q-item>
+                          <q-item v-for="(item,i) in problem.options" :key="i">
+                            <q-item-section>
+                              <div>
+                                <q-chip dense square>{{ i + 1 }}</q-chip>
+                                <input v-model="item.label" @change="item.value=item.label" class="input-option"
+                                       placeholder="输入选项"/>
+                              </div>
+                            </q-item-section>
+                            <q-item-section side>
+                              <div class="text-grey-8 q-gutter-xs">
+                                <q-btn style="display: inline !important;" class="gt-xs" size="12px" flat dense
+                                       icon="delete"
+                                       @click="delOption(pid,i)"/>
+                                <q-btn size="12px" flat dense icon="arrow_upward" @click="upOption(pid,i)"/>
+                                <q-btn size="12px" flat dense icon="arrow_downward" @click="downOption(pid,i)"/>
+                              </div>
+                            </q-item-section>
+                          </q-item>
+                          <q-separator/>
+                          <q-item
+                            :style="{border: (onAddOption===pid)?'1px #66BB6A solid':'1px transparent solid'}"
+                          >
+                            <q-item-section>
+                              <div>
+                                <q-icon color="primary" size="12px" style="width: 25px" name="create"/>
+                                <input autofocus="autofocus" v-model="templateOptions.label"
+                                       class="input-option add-option"
+                                       placeholder="在此添加选项" @keyup.enter="addOption(pid)" @focus="onAddOption=pid"
+                                       @blur="onAddOption=-1"/>
+                              </div>
+                            </q-item-section>
+                            <q-item-section side>
+                              <div class="text-grey-8 q-gutter-xs">
+                                <q-btn class="gt-xs" style="display: inline !important;" size="12px" flat dense round
+                                       icon="add" @click="addOption(pid)"/>
+                              </div>
+                            </q-item-section>
+                          </q-item>
+                        </q-list>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </transition-group>
               </div>
+
+              <q-btn-group spread outline class="q-mt-lg" stretch style="border: 1px #cccccc solid;">
+                <q-btn label="选择题" icon="check_box" @click="addChoiceQuestion"/>
+                <q-btn label="填空题" icon="question_answer" @click="addBlankQuestion"/>
+                <q-btn label="预览" icon="visibility" @click="paperSimulate=true"/>
+                <q-btn label="保存" icon="save" @click="onSave"/>
+              </q-btn-group>
+
             </div>
           </div>
         </div>
-        <q-footer v-show="!paperSimulate" elevated>
-          <q-btn-group spread flat>
-            <q-btn label="添加选择题" icon="check_box" @click="addChoiceQuestion"/>
-            <q-btn label="添加填空题" icon="question_answer" @click="addBlankQuestion"/>
-            <q-btn label="预览" icon="visibility" @click="paperSimulate=true"/>
-            <q-btn label="保存" icon="save" @click="onSave"/>
-          </q-btn-group>
-        </q-footer>
       </q-tab-panel>
       <q-tab-panel name="send" class="column">
         <div style="max-width: calc(100vw - 32px);">
@@ -187,7 +194,7 @@
             </template>
             当前问卷已停止收集，受访者无法填写问卷。
             <template v-slot:action>
-              <q-btn flat color="primary" @click="tab='setting'" label="改变问卷设置"/>
+              <q-btn flat color="primary" icon="play_arrow" @click="surveyData.running=true;onSave()" label="开始收集问卷"/>
             </template>
           </q-banner>
           <q-banner v-if="!surveyData.open" class="bg-primary text-white" rounded>
@@ -196,7 +203,7 @@
             </template>
             此问卷是定向问卷，请选择在列表在选择受访者。
             <template v-slot:action>
-              <q-btn flat color="white" @click="routeTo('/manage/respondents')" label="管理受访者↗"/>
+<!--              <q-btn flat color="white" @click="routeTo('/manage/respondents')" label="管理受访者↗"/>-->
               <q-btn flat color="white" @click="tab='setting'" label="改变问卷访问权限"/>
             </template>
           </q-banner>
@@ -206,10 +213,10 @@
             </template>
             此问卷是开放问卷，可使用如下链接匿名作答。
             <q-card class="q-mt-sm q-pa-md text-center text-italic" flat>
-              <a :href="openLink" class="q-link text-blue-7">{{ openLink }}</a>
+              <a :href="openLink" class="q-link text-blue-7" style="width: 90%;word-wrap: anywhere">{{ openLink }}</a>
             </q-card>
             <template v-slot:action>
-              <q-btn flat color="white" @click="routeTo('/manage/respondents')" label="管理受访者↗"/>
+<!--              <q-btn flat color="white" @click="routeTo('/manage/respondents')" label="管理受访者↗"/>-->
               <q-btn flat color="white" @click="tab='setting'" label="改变问卷访问权限"/>
             </template>
           </q-banner>
@@ -226,6 +233,7 @@
             >
               <template v-slot:top-right>
                 <div class="flex row">
+                  <q-btn color="secondary" flat class="q-mr-md" @click="routeTo('/manage/respondents')" label="管理受访者↗"/>
                   <q-btn color="primary" :disable="selected.length===0" @click="onSend">发送问卷
                   </q-btn>
                 </div>
@@ -330,7 +338,10 @@
         <div class="flex justify-center">
           <q-list bordered separator class="san-grail">
             <q-item>
-              <q-item-section>{{ surveyData.running ? '允许作答' : '停止收集问卷' }}</q-item-section>
+              <q-item-section>发布问卷
+                <span class="text-grey" style="font-size: 5px">
+                  {{ surveyData.running ? '允许作答' : '停止收集问卷' }}</span>
+              </q-item-section>
               <q-item-section side>
                 <div class="text-grey-8 q-gutter-xs">
                   <q-toggle v-model="surveyData.running" @input="onSave"/>
@@ -338,7 +349,10 @@
               </q-item-section>
             </q-item>
             <q-item>
-              <q-item-section>{{ surveyData.open ? "开放问卷 (收到链接者均可作答)" : "定向问卷 (仅受邀用户可以作答)" }}</q-item-section>
+              <q-item-section>问卷类型
+                <span class="text-grey" style="font-size: 5px">
+                {{ surveyData.open ? "开放问卷 (收到链接者均可作答)" : "定向问卷 (仅受邀用户可以作答)" }}</span>
+              </q-item-section>
               <q-item-section side>
                 <div class="text-grey-8 q-gutter-xs">
                   <q-toggle v-model="surveyData.open" @input="onSave"/>
@@ -462,7 +476,8 @@ export default {
         open: null,
         respondent_ids: [],
         startTime: null
-      }
+      },
+      onAddOption: null,
     }
   },
   async created() {
@@ -650,6 +665,9 @@ export default {
           options: [],
         }
       )
+      setTimeout(() => {
+        window.scrollBy(0, 120)
+      }, 100)
     }
     ,
     addBlankQuestion() {
@@ -660,6 +678,9 @@ export default {
         title: "",
         desc: ""
       },)
+      setTimeout(() => {
+        window.scrollBy(0, 120)
+      }, 100)
     }
   }
 }
@@ -750,5 +771,14 @@ export default {
 
 .ques-section {
   margin: 15px 0;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: all .5s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  height: 0;
 }
 </style>
