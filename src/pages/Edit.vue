@@ -31,6 +31,26 @@
         <div class="column flex-center">
           <div class="san-grail">
             <div class="q-ma-lg">
+              <q-banner dense inline-actions class="text-white bg-red q-mb-md" v-if="voidSurvey">
+                此问卷不包含题目！
+                <template v-slot:avatar>
+                  <q-icon name="warning" color="white"/>
+                </template>
+              </q-banner>
+
+              <!--              <q-banner dense inline-actions class="text-white bg-orange q-mb-md" v-else-if="noRequireProblem">-->
+              <!--                此问卷不包含必答题。-->
+              <!--                <template v-slot:avatar>-->
+              <!--                  <q-icon name="warning" color="white"/>-->
+              <!--                </template>-->
+              <!--              </q-banner>-->
+              <!--              <q-banner dense inline-actions class="text-white bg-orange q-mb-md" v-if="voidProblem||noOptionProblem">-->
+              <!--                <div v-if="voidProblem">问卷中存在无标题题目</div>-->
+              <!--                <div v-if="noOptionProblem">问卷中存在无选项选择题</div>-->
+              <!--                <template v-slot:avatar style="height: 100%">-->
+              <!--                  <q-icon name="priority_high" color="white"/>-->
+              <!--                </template>-->
+              <!--              </q-banner>-->
               <div class="paper-header">
                 <div class="text-h4 editable text-center paper-title">
                   <span v-if="surveyData.title!==''">{{ surveyData.title }}</span>
@@ -52,9 +72,12 @@
               </div>
               <div class="column">
                 <transition-group name="fade">
-                  <div v-for="(problem,pid) in surveyData.problemSet" :key="problem.title+pid" class="ques-section">
+                  <div v-for="(problem,pid) in surveyData.problemSet" :key="pid+1" class="ques-section">
                     <div v-if="problem.type===0">
                       <div v-if="editing!==pid" @click="editing=pid;isEditing=true" class="editable">
+                        <div class="float-right q-pa-sm" v-if="!validProblem(pid)">
+                          <q-icon name="error" color="red" size="25px"></q-icon>
+                        </div>
                         <div class="text-h6 ques-title-large">
                           <b>{{ pid + 1|formatIndex }} / </b>
                           <span v-if="problem.title!==''">{{ problem.title }}</span>
@@ -70,7 +93,8 @@
                       <div v-if="editing===pid">
                         <div class="text-h6 ques-title-large">
                           <b>{{ pid + 1|formatIndex }} / </b>
-                          <input v-model="problem.title" placeholder="输入问题" minlength="1" maxlength="128"
+                          <input v-model="problem.title" autofocus="autofocus" placeholder="输入问题" minlength="1"
+                                 maxlength="128"
                                  class="input-title"/>
                           <span v-if="problem.need" class="text-red"> *</span>
                           <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
@@ -82,10 +106,12 @@
                           </div>
                         </div>
                       </div>
-
                     </div>
                     <div v-else-if="problem.type===1">
                       <div class="editable" @click="editing=pid;isEditing=true;onAddOption=pid" v-if="editing!==pid">
+                        <div class="float-right q-pa-sm" v-if="!validProblem(pid)">
+                          <q-icon name="error" color="red" size="25px"></q-icon>
+                        </div>
                         <div class="text-h6 ques-title">
                           <b>{{ pid + 1 |formatIndex }} / </b>
                           <span v-if="problem.title!==''">{{ problem.title }}</span>
@@ -110,8 +136,9 @@
                       <div v-else>
                         <div class="text-h6 ques-title">
                           <b>{{ pid + 1 |formatIndex }} / </b>
-                          <input v-model="problem.title" placeholder="输入问题" minlength="1" maxlength="128"
-                                 class="input-title"/>
+                          <input v-model="problem.title" autofocus="autofocus" placeholder="输入问题" minlength="1"
+                                 maxlength="128"
+                                 class="input-title" :style="{'border-color': problem.title===''? '#C10015':'#1976D2'}">
                           <span v-if="problem.need" class="text-red"> *</span>
                           <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
                             <q-toggle label="必填项" dense v-model="problem.need"/>
@@ -126,7 +153,7 @@
                           <q-separator/>
                           <q-item v-if="problem.options.length===0">
                             <div class="q-ma-sm">
-                              <q-icon name="warning"/>
+                              <q-icon name="error" color="red"/>
                               <span>&nbsp;请添加选项</span>
                             </div>
                           </q-item>
@@ -155,7 +182,7 @@
                             <q-item-section>
                               <div>
                                 <q-icon color="primary" size="12px" style="width: 25px" name="create"/>
-                                <input autofocus="autofocus" v-model="templateOptions.label"
+                                <input v-model="templateOptions.label"
                                        class="input-option add-option"
                                        placeholder="在此添加选项" @keyup.enter="addOption(pid)" @focus="onAddOption=pid"
                                        @blur="onAddOption=-1"/>
@@ -174,12 +201,12 @@
                   </div>
                 </transition-group>
               </div>
-
-              <q-btn-group spread outline class="q-mt-lg" stretch style="border: 1px #cccccc solid;">
-                <q-btn label="选择题" icon="check_box" @click="addChoiceQuestion"/>
-                <q-btn label="填空题" icon="question_answer" @click="addBlankQuestion"/>
-                <q-btn label="预览" icon="visibility" @click="paperSimulate=true"/>
-                <q-btn label="保存" icon="save" @click="onSave"/>
+              <q-space style="height: 100px"/>
+              <q-btn-group spread outline class="q-mt-lg shadow-3 edit-toolbox" stretch>
+                <q-btn label="选择题" stack icon="check_box" @click="addChoiceQuestion"/>
+                <q-btn label="填空题" stack icon="question_answer" @click="addBlankQuestion"/>
+                <q-btn label="预览" stack icon="visibility" @click="paperSimulate=true"/>
+                <q-btn label="保存" stack icon="save" @click="onSave"/>
               </q-btn-group>
 
             </div>
@@ -203,7 +230,7 @@
             </template>
             此问卷是定向问卷，请选择在列表在选择受访者。
             <template v-slot:action>
-<!--              <q-btn flat color="white" @click="routeTo('/manage/respondents')" label="管理受访者↗"/>-->
+              <!--              <q-btn flat color="white" @click="routeTo('/manage/respondents')" label="管理受访者↗"/>-->
               <q-btn flat color="white" @click="tab='setting'" label="改变问卷访问权限"/>
             </template>
           </q-banner>
@@ -212,11 +239,15 @@
               <q-icon name="wifi_tethering"/>
             </template>
             此问卷是开放问卷，可使用如下链接匿名作答。
-            <q-card class="q-mt-sm q-pa-md text-center text-italic" flat>
-              <a :href="openLink" class="q-link text-blue-7" style="width: 90%;word-wrap: anywhere">{{ openLink }}</a>
+            <q-card class="q-mt-sm q-pa-md text-center text-italic" style="max-width: 100vw" flat>
+              <a :href="openLink" class="q-link text-blue-7">
+                <span style="word-wrap: anywhere;word-break: break-all">
+                {{ openLink }}
+                </span>
+              </a>
             </q-card>
             <template v-slot:action>
-<!--              <q-btn flat color="white" @click="routeTo('/manage/respondents')" label="管理受访者↗"/>-->
+              <!--              <q-btn flat color="white" @click="routeTo('/manage/respondents')" label="管理受访者↗"/>-->
               <q-btn flat color="white" @click="tab='setting'" label="改变问卷访问权限"/>
             </template>
           </q-banner>
@@ -281,11 +312,11 @@
                         <span v-if="problem.need" class="text-red"> *</span>
                       </div>
                       <q-list bordered separator>
-                        <q-item v-for="(ans,cnt) in problem.answer" :key="ans">
+                        <q-item v-for="(cnt,ans) in problem.answer" :key="ans">
                           <q-item-section>{{ ans }}</q-item-section>
                           <q-item-section side>
                             <div class="text-grey-8 q-gutter-xs">
-                              {{ cnt }}
+                              ×{{ cnt }}
                             </div>
                           </q-item-section>
                         </q-item>
@@ -295,8 +326,14 @@
                             <span>&nbsp;&nbsp;暂无作答</span>
                           </div>
                         </q-item>
-                      </q-list>
 
+                        <!--                        <q-item clickable v-if="showAllAnswer!==pid" @click="showAllAnswer=pid">-->
+                        <!--                          <q-item-section class="text-center text-primary">显示全部</q-item-section>-->
+                        <!--                        </q-item>-->
+                        <!--                        <q-item clickable v-if="showAllAnswer===pid" @click="showAllAnswer=null">-->
+                        <!--                          <q-item-section class="text-center text-primary">收起</q-item-section>-->
+                        <!--                        </q-item>-->
+                      </q-list>
                     </div>
                   </div>
                   <div v-else-if="problem.type===1">
@@ -311,11 +348,12 @@
                         <q-item v-for="(option,i) in problem.options" :key="i">
                           <q-item-section>
                             {{ option.label }}
-                            <q-linear-progress :value="problem.frequency? option.frequency/problem.frequency:0"/>
+                            <q-linear-progress
+                              :value="problem.frequency&&problem.answer? ((option.label in problem.answer)?problem.answer[option.label]:0)/problem.frequency:0"/>
                           </q-item-section>
                           <q-item-section side>
                             <div class="text-grey-8 q-gutter-xs">
-                              {{ option.frequency }}
+                              {{ problem.answer[option.label] }}
                             </div>
                           </q-item-section>
                         </q-item>
@@ -339,7 +377,7 @@
           <q-list bordered separator class="san-grail">
             <q-item>
               <q-item-section>发布问卷
-                <span class="text-grey" style="font-size: 5px">
+                <span class="text-grey">
                   {{ surveyData.running ? '允许作答' : '停止收集问卷' }}</span>
               </q-item-section>
               <q-item-section side>
@@ -350,7 +388,7 @@
             </q-item>
             <q-item>
               <q-item-section>问卷类型
-                <span class="text-grey" style="font-size: 5px">
+                <span class="text-grey">
                 {{ surveyData.open ? "开放问卷 (收到链接者均可作答)" : "定向问卷 (仅受邀用户可以作答)" }}</span>
               </q-item-section>
               <q-item-section side>
@@ -478,6 +516,7 @@ export default {
         startTime: null
       },
       onAddOption: null,
+      showAllAnswer: null
     }
   },
   async created() {
@@ -495,9 +534,39 @@ export default {
   computed: {
     startTimeEnable() {
       return this.surveyData.startTime !== null
+    },
+    voidSurvey() {
+      return this.surveyData.problemSet.length === 0
+    },
+    voidProblem() {
+      for (let i = this.surveyData.problemSet.length - 1; i >= 0; --i) {
+        if (this.surveyData.problemSet[i].title === '') return true
+      }
+      return false
+    },
+    noRequireProblem() {
+      for (let i = this.surveyData.problemSet.length - 1; i >= 0; --i) {
+        if (this.surveyData.problemSet[i].need) return false
+      }
+      return true
+    },
+    noOptionProblem() {
+      for (let i = this.surveyData.problemSet.length - 1; i >= 0; --i) {
+        if (this.surveyData.problemSet[i].type === 1 && this.surveyData.problemSet[i].options.length === 0) return true
+      }
+      return false
     }
   },
   methods: {
+    validProblem(pid) {
+      if (this.surveyData.problemSet[pid].type === 0) {
+        if (this.surveyData.problemSet[pid].title === '') return false
+      } else {
+        if (this.surveyData.problemSet[pid].title === '') return false
+        if (this.surveyData.problemSet[pid].options.length === 0) return false
+      }
+      return true
+    },
     async getResponse() {
       const res = await getSurveyResult({id: this.id})
       this.resultData = res.data.data
@@ -568,6 +637,13 @@ export default {
     }
     ,
     addOption(pid) {
+      for (let i = this.surveyData.problemSet[pid].options.length - 1; i >= 0; --i) {
+        if (this.surveyData.problemSet[pid].options[i].label === this.templateOptions.label) {
+          Notify.create({message: "选项重复，已合并", color: 'secondary', position: 'top', timeout: 1500})
+          this.templateOptions.label = ""
+          return
+        }
+      }
       this.surveyData.problemSet[pid].options.push({
         label: this.templateOptions.label,
         value: this.templateOptions.label
@@ -600,6 +676,10 @@ export default {
     ,
     async getSurveyData() {
       const res = await getSurveyItem({id: this.id})
+      if (res.data.code !== 0) {
+        await this.$router.push('/manage')
+        return
+      }
       this.surveyData = res.data.data
       this.sortProblems()
       for (let i = 0; i < this.surveyData.problemSet.length; i++) {
@@ -656,6 +736,7 @@ export default {
     }
     ,
     addChoiceQuestion() {
+      window.scrollBy(0, document.body.scrollHeight)
       this.surveyData.problemSet.push({
           type: 1,
           index: this.surveyData.problemSet.length + 1,
@@ -665,9 +746,6 @@ export default {
           options: [],
         }
       )
-      setTimeout(() => {
-        window.scrollBy(0, 120)
-      }, 100)
     }
     ,
     addBlankQuestion() {
@@ -679,7 +757,7 @@ export default {
         desc: ""
       },)
       setTimeout(() => {
-        window.scrollBy(0, 120)
+        window.scrollBy(0, document.body.scrollHeight)
       }, 100)
     }
   }
@@ -774,11 +852,19 @@ export default {
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: all .5s;
+  transition: all .8s;
 }
 
 .fade-enter, .fade-leave-to {
   opacity: 0;
-  height: 0;
+}
+
+.edit-toolbox {
+  position: fixed;
+  bottom: 60px;
+  left: max(5vw, calc(50vw - 400px));
+  width: min(90vw, 800px);
+  max-width: 100%;
+  background-color: #fffffff0;
 }
 </style>

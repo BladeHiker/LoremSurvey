@@ -28,7 +28,8 @@
           <div v-if="problem.type===0">
             <div class="text-h6 ques-title-large">
               <b>{{ problem.index|formatIndex }} / </b>
-              <span>{{ problem.title }}</span>
+              <span v-if="problem.title!==''">{{ problem.title }}</span>
+              <span v-else class="text-italic text-grey">(未设置题目)</span>
               <span v-if="problem.need" class="text-red"> *</span>
             </div>
             <q-input
@@ -53,7 +54,8 @@
           <div v-else-if="problem.type===1">
             <div class="text-h6 ques-title">
               <b>{{ problem.index |formatIndex }} / </b>
-              <span>{{ problem.title }}</span>
+              <span v-if="problem.title!==''">{{ problem.title }}</span>
+              <span v-else class="text-italic text-grey">(未设置题目)</span>
               <span v-if="problem.need" class="text-red"> *</span>
             </div>
             <q-field

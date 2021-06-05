@@ -42,6 +42,10 @@ service.interceptors.response.use(
         //用户操作错误
         Notify.create({message: response.data.message.toString(), color: 'info', position: 'top', timeout: 1500})
         return response
+      case -1:
+        //系统错误
+        Notify.create({message: '系统错误', color: 'warning', position: 'top', timeout: 1500})
+        return response
       case 7:
         Notify.create({message: response.data.message.toString(), color: 'warning', position: 'top', timeout: 1500})
         return response

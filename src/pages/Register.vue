@@ -11,7 +11,7 @@
         <q-input
           label="用户名"
           v-model="registerForm.username"
-          maxlength="20"
+          maxlength="50"
           lazy-rules
           :rules="[
             val => val && val.length > 0 || '请输入用户名',
@@ -39,7 +39,7 @@
         <q-input
           label="邮箱"
           v-model="registerForm.email"
-          maxlength="20"
+          maxlength="50"
           lazy-rules
           :rules="[
             val => val && val.length > 0 || '请输入邮箱',
