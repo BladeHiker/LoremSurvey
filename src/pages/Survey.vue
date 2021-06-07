@@ -19,10 +19,12 @@
         autocorrect="off"
         autocapitalize="off"
         autocomplete="off"
+        autosubmit="false"
         spellcheck="false"
         class="column"
         @validation-error="validError"
-        @submit="submit"
+        @submit="null"
+        @submit.native.prevent
       >
         <div v-for="(problem,i) in (demoMode ? sdata.problemSet: surveyData.problemSet)" :key="i" class="ques-section">
           <div v-if="problem.type===0">
@@ -95,10 +97,10 @@
         <q-btn
           :label="submitted===1?'提交成功': '提交'"
           :color="submitted===1?'secondary': 'primary'"
-          type="submit"
           class="flex-center submit-btn"
           :disable="submitted!==0"
           :loading="submitted===-1"
+          @click="submit"
         />
 
       </q-form>

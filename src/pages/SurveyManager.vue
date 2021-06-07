@@ -18,7 +18,9 @@
       </div>
       <div class="flex row surveys">
         <q-card v-for="(item,i) in surveyList" v-bind:key="i" class="survey-item">
-          <q-card-section class="survey-top text-white" :class="'bg-'+ colorList[i*7%6]">
+          <q-card-section class="survey-top text-white"
+                          :class="'bg-'+ colorList[(item.id[item.id.length-1])*7%6]"
+                          @click="routeTo('manage/edit/'+item.id)">
             <div class="text-h6">
               <div>{{ item.title }}</div>
               <div class="text-subtitle2">
@@ -97,8 +99,9 @@ export default {
         cancel: true,
         persistent: true
       }).onOk(() => {
-        deleteSurveyItem({id: i})
-        this.getData()
+        deleteSurveyItem({id: i}).then(() => {
+          this.getData()
+        })
       })
     }
   }
@@ -110,6 +113,14 @@ export default {
   width: 270px;
   height: 215px;
   margin-bottom: 20px;
+}
+
+.survey-item:hover {
+  transform: scale(1.01);
+}
+
+.survey-item:active {
+  transform: scale(0.99);
 }
 
 .surveys {
@@ -126,6 +137,7 @@ export default {
 }
 
 .survey-top {
+  cursor: pointer;
   height: 160px;
   text-shadow: 3px 2px 11px #2d2d2da3;
 }

@@ -20,10 +20,10 @@
         stretch
         inline-label
       >
-        <q-route-tab :to="{ }" name="edit" icon="edit" label="编辑"/>
-        <q-route-tab :to="{ query: { tab: '2' } }" name="send" icon="share" label="发布"/>
-        <q-route-tab :to="{ query: { tab: '3' } }" name="response" icon="equalizer" label="结果"/>
-        <q-route-tab :to="{ query: { tab: '4' } }" name="setting" icon="settings" label="设置"/>
+        <q-route-tab :to="{ }" name="edit" icon="edit" label="编辑" replace/>
+        <q-route-tab :to="{ query: { tab: '2' } }" name="send" icon="share" label="发布" replace/>
+        <q-route-tab :to="{ query: { tab: '3' } }" name="response" icon="equalizer" label="结果" replace/>
+        <q-route-tab :to="{ query: { tab: '4' } }" name="setting" icon="settings" label="设置" replace/>
       </q-tabs>
     </q-footer>
     <q-tab-panels v-model="tab" @transition="prepareData" animated>
@@ -228,7 +228,7 @@
             <template v-slot:avatar>
               <q-icon name="group_add"/>
             </template>
-            此问卷是定向问卷，请选择在列表在选择受访者。
+            此问卷是<b>定向问卷</b>，请选择在列表在选择受访者。系统会为您选择的受访者生成单次有效的私密链接，并通过电子邮件发送。
             <template v-slot:action>
               <!--              <q-btn flat color="white" @click="routeTo('/manage/respondents')" label="管理受访者↗"/>-->
               <q-btn flat color="white" @click="tab='setting'" label="改变问卷访问权限"/>
@@ -494,7 +494,7 @@ export default {
           name: 'id',
           required: true,
           label: '学号/工号',
-          field: 'id',
+          field: 'sid',
           sortable: true
         },
         {name: 'name', label: '姓名', field: 'name', sortable: true},
@@ -502,7 +502,12 @@ export default {
         {name: 'sex', label: '性别', field: 'sex'},
         {name: 'phone', label: '手机号', field: 'phone'},
         {name: 'email', label: '邮箱', field: 'email'},
-        {name: 'status', label: '状态', field: 'status', format: val => val === 0 ? "未发送" : "已发送"},
+        {
+          name: 'status', label: '状态', field: 'status', format: val => {
+            if (this.surveyData.open) return "-"
+            return val === 0 ? "未发送" : "已发送"
+          }
+        },
       ],
       isEditing: false,
       openLink: null,
@@ -657,6 +662,9 @@ export default {
     ,
     prepareData() {
       switch (this.tab) {
+        case "edit":
+          this.getSurveyData()
+          break;
         case "send":
           this.getRespondentList()
           break;

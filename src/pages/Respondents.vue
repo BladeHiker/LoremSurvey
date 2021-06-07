@@ -95,7 +95,9 @@ export default {
       for (let i = 0; i < this.selected.length; i++) {
         delList.push(this.selected[i].id)
       }
-      deleteRespondents(delList)
+      deleteRespondents(delList).then(() => {
+        this.getData()
+      })
     }
   }
 }
