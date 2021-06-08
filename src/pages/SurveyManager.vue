@@ -19,7 +19,7 @@
       <div class="flex row surveys">
         <q-card v-for="(item,i) in surveyList" v-bind:key="i" class="survey-item">
           <q-card-section class="survey-top text-white"
-                          :class="'bg-'+ colorList[(item.id[item.id.length-1])*7%6]"
+                          :class="'bg-'+ colorList[(item.id.charCodeAt(item.id.length-1)*item.id.charCodeAt(item.id.length-2))*37%6]"
                           @click="routeTo('manage/edit/'+item.id)">
             <div class="text-h6">
               <div>{{ item.title }}</div>
@@ -51,6 +51,55 @@
         <div class="survey-void"></div>
         <div class="survey-void"></div>
       </div>
+      <q-dialog v-model="addDialog">
+        <q-card>
+          <q-card-section>
+            <div class="text-h6">选择问卷类型</div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-none">
+            <q-btn-toggle
+              v-model="surveyOpen"
+              toggle-color="primary"
+              :options="[{value: true, slot: 'one'},{value: false, slot: 'two'},]"
+            >
+              <template v-slot:one>
+                <div class="row items-center no-wrap q-pa-md">
+                  <div class="text-center">
+                    <b class="text-h5">开放问卷</b>
+                    <hr/>
+                    <div>
+                      受访者通过问卷链接匿名做答
+                      <br/>
+                      问卷链接多次有效
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+              <template v-slot:two>
+                <div class="row items-center no-wrap q-pa-md">
+                  <div class="text-center">
+                    <b class="text-h5">定向问卷</b>
+                    <hr/>
+                    <div>
+                      受访者通过私密链接实名作答
+                      <br/>
+                      问卷链接单次有效
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </q-btn-toggle>
+            <div class="q-mt-md"> * 问卷类型可以在创建后切换</div>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn flat label="取消" color="primary" v-close-popup/>
+            <q-btn flat label="创建" color="primary" @click="createSurvey" v-close-popup/>
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
   </q-page>
 </template>
@@ -63,6 +112,8 @@ export default {
   data() {
     return {
       surveyList: [],
+      addDialog: false,
+      surveyOpen: true,
       colorList: ['primary', 'secondary', 'accent', 'positive', 'info', 'warning']
     }
   },
@@ -79,8 +130,12 @@ export default {
       this.$router.push(url)
     },
     onCreateSurvey() {
+      this.surveyOpen = true
+      this.addDialog = true
+    },
+    createSurvey() {
       createSurveyItem({
-        open: false,
+        open: this.surveyOpen,
         running: false,
         title: "无标题问卷",
         startTime: null,

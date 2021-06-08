@@ -238,7 +238,7 @@
             <template v-slot:avatar>
               <q-icon name="wifi_tethering"/>
             </template>
-            此问卷是开放问卷，可使用如下链接匿名作答。
+            此问卷是<b>开放问卷</b>，可使用如下链接匿名作答。
             <q-card class="q-mt-sm q-pa-md text-center text-italic" style="max-width: 100vw" flat>
               <a :href="openLink" class="q-link text-blue-7">
                 <span style="word-wrap: anywhere;word-break: break-all">
@@ -311,12 +311,13 @@
                         <span v-else class="text-green-5"><i>无标题</i></span>
                         <span v-if="problem.need" class="text-red"> *</span>
                       </div>
-                      <q-list bordered separator>
-                        <q-item v-for="(cnt,ans) in problem.answer" :key="ans">
-                          <q-item-section>{{ ans }}</q-item-section>
+                      <q-list bordered separator
+                              v-if="showAllAns[pid]!==true">
+                        <q-item v-for="(ans,i) in previewList(problem.answer)" :key="i">
+                          <q-item-section>{{ Object.keys(ans)[0] }}</q-item-section>
                           <q-item-section side>
                             <div class="text-grey-8 q-gutter-xs">
-                              ×{{ cnt }}
+                              ×{{ Object.values(ans)[0] }}
                             </div>
                           </q-item-section>
                         </q-item>
@@ -326,13 +327,28 @@
                             <span>&nbsp;&nbsp;暂无作答</span>
                           </div>
                         </q-item>
-
-                        <!--                        <q-item clickable v-if="showAllAnswer!==pid" @click="showAllAnswer=pid">-->
-                        <!--                          <q-item-section class="text-center text-primary">显示全部</q-item-section>-->
-                        <!--                        </q-item>-->
-                        <!--                        <q-item clickable v-if="showAllAnswer===pid" @click="showAllAnswer=null">-->
-                        <!--                          <q-item-section class="text-center text-primary">收起</q-item-section>-->
-                        <!--                        </q-item>-->
+                        <q-item clickable @click="switchShow(pid)" v-if="problem.answer.length>5">
+                          <q-item-section class="text-center text-primary">显示全部</q-item-section>
+                        </q-item>
+                      </q-list>
+                      <q-list bordered separator v-else>
+                        <q-item v-for="(ans,i) in problem.answer" :key="i">
+                          <q-item-section>{{ Object.keys(ans)[0] }}</q-item-section>
+                          <q-item-section side>
+                            <div class="text-grey-8 q-gutter-xs">
+                              ×{{ Object.values(ans)[0] }}
+                            </div>
+                          </q-item-section>
+                        </q-item>
+                        <q-item v-if="!problem.frequency || problem.frequency===0">
+                          <div class="q-ma-sm">
+                            <q-icon name="warning"/>
+                            <span>&nbsp;&nbsp;暂无作答</span>
+                          </div>
+                        </q-item>
+                        <q-item clickable @click="switchShow(pid)">
+                          <q-item-section class="text-center text-primary">收起</q-item-section>
+                        </q-item>
                       </q-list>
                     </div>
                   </div>
@@ -353,7 +369,7 @@
                           </q-item-section>
                           <q-item-section side>
                             <div class="text-grey-8 q-gutter-xs">
-                              {{ problem.answer[option.label] }}
+                              {{ option.label in problem.answer ? problem.answer[option.label] : '0' }}
                             </div>
                           </q-item-section>
                         </q-item>
@@ -471,6 +487,7 @@ import {
   sendSurveyToRespondents
 } from "src/api/surveyAdmin";
 import {Notify} from "quasar";
+import Vue from "vue";
 
 export default {
   name: "Edit",
@@ -521,7 +538,7 @@ export default {
         startTime: null
       },
       onAddOption: null,
-      showAllAnswer: null
+      showAllAns: []
     }
   },
   async created() {
@@ -563,6 +580,13 @@ export default {
     }
   },
   methods: {
+    switchShow(pid) {
+      Vue.set(this.showAllAns, pid, !this.showAllAns[pid])
+    },
+    previewList(list) {
+      if (!Array.isArray(list)) return null
+      return list.slice(0, 5)
+    },
     validProblem(pid) {
       if (this.surveyData.problemSet[pid].type === 0) {
         if (this.surveyData.problemSet[pid].title === '') return false
@@ -578,6 +602,13 @@ export default {
       this.resultData.problemSet.sort((a, b) => {
         return a.index > b.index ? 1 : -1
       })
+      for (let i = this.resultData.problemSet.length - 1; i >= 0; --i) {
+        this.showAllAns.push(false)
+        if (this.resultData.problemSet[i].type === 0)
+          this.resultData.problemSet[i].answer.sort((a, b) => {
+            return Object.values(a)[0] < Object.values(b)[0] ? 1 : -1
+          })
+      }
     },
     switchStime() {
 

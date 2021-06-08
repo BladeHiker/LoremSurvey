@@ -165,6 +165,7 @@ export default {
         console.log(err)
         this.loading = false
       }).finally(() => {
+        this.loading = false
         this.passwordAgain = this.registerForm.password = ""
         this.getCaptchaData()
       })
