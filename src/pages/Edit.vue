@@ -219,7 +219,7 @@
             <template v-slot:avatar>
               <q-icon name="speaker_notes_off" color="primary"/>
             </template>
-            当前问卷已停止收集，受访者无法填写问卷。
+            当前问卷已<span class="text-red-7 text-bold">停止收集</span>，受访者无法填写问卷。
             <template v-slot:action>
               <q-btn flat color="primary" icon="play_arrow" @click="surveyData.running=true;onSave()" label="开始收集问卷"/>
             </template>
@@ -286,8 +286,8 @@
                 <q-card>
                   <q-card-section horizontal class="flex row flex-center justify-around q-pa-md">
                     <q-card-section class="flex flex-center column">
-                      <div class="text-h5 text-blue-7">{{ resultData.frequency ? resultData.frequency : '-' }}</div>
-                      <div>已收集问卷</div>
+                      <div class="text-h5 text-blue-7">{{ resultData.frequency ? resultData.frequency : '0' }}</div>
+                      <div>已收集问卷数</div>
                     </q-card-section>
                     <q-card-section class="flex flex-center column">
                       <div class="text-h5 text-blue-7" v-if="surveyData.running">

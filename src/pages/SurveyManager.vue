@@ -64,12 +64,13 @@
               :options="[{value: true, slot: 'one'},{value: false, slot: 'two'},]"
             >
               <template v-slot:one>
-                <div class="row items-center no-wrap q-pa-md">
+                <div class="row items-center no-wrap q-py-md">
                   <div class="text-center">
                     <b class="text-h5">开放问卷</b>
                     <hr/>
                     <div>
                       受访者通过问卷链接匿名做答
+                      <br/>
                       <br/>
                       问卷链接多次有效
                     </div>
@@ -78,12 +79,13 @@
               </template>
 
               <template v-slot:two>
-                <div class="row items-center no-wrap q-pa-md">
+                <div class="row items-center no-wrap q-py-md">
                   <div class="text-center">
                     <b class="text-h5">定向问卷</b>
                     <hr/>
                     <div>
                       受访者通过私密链接实名作答
+                      <br/>
                       <br/>
                       问卷链接单次有效
                     </div>
@@ -165,7 +167,7 @@ export default {
 
 <style scoped>
 .survey-item {
-  width: 270px;
+  width: 300px;
   height: 215px;
   margin-bottom: 20px;
 }
@@ -204,6 +206,6 @@ export default {
 
 
 .survey-void {
-  width: 270px;
+  width: 300px;
 }
 </style>
