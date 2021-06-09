@@ -18,13 +18,9 @@
         ref="surveyForm"
         autocorrect="off"
         autocapitalize="off"
-        autocomplete="off"
-        autosubmit="false"
         spellcheck="false"
         class="column"
         @validation-error="validError"
-        @submit="null"
-        @submit.native.prevent
       >
         <div v-for="(problem,i) in (demoMode ? sdata.problemSet: surveyData.problemSet)" :key="i" class="ques-section">
           <div v-if="problem.type===0">
@@ -51,6 +47,7 @@
               filled
               v-model="answer.problemSet[i].answer"
               :rules="[val => !problem.need||(val!=null&&val!='') ||'必填项']"
+              @keydown.enter.prevent
             />
           </div>
           <div v-else-if="problem.type===1">
@@ -192,22 +189,27 @@ export default {
   },
   methods: {
     submit() {
-      if (this.demoMode) {
-        Notify.create({message: "模拟提交动作，不会收集数据", color: 'secondary', position: 'top', timeout: 500})
-        this.submitted = -1
-        setTimeout(() => {
-          this.submitted = 1
-        }, 1000)
-        return
-      }
-      this.submitted = -1
-      submitSurvey({sessionid: this.sessionId}, {problemSet: this.answer.problemSet}).then((res) => {
-        if (res.data.code === 0) {
-          this.submitted = 1
-        } else {
-          this.submitted = 0
+      this.$refs.surveyForm.validate().then(success => {
+        if (success) {
+          if (this.demoMode) {
+            Notify.create({message: "模拟提交动作，不会收集数据", color: 'secondary', position: 'top', timeout: 500})
+            this.submitted = -1
+            setTimeout(() => {
+              this.submitted = 1
+            }, 1000)
+            return
+          }
+          this.submitted = -1
+          submitSurvey({sessionid: this.sessionId}, {problemSet: this.answer.problemSet}).then((res) => {
+            if (res.data.code === 0) {
+              this.submitted = 1
+            } else {
+              this.submitted = 0
+            }
+          })
         }
       })
+
 
     },
     validError() {
