@@ -1,12 +1,7 @@
-import Vue from 'vue'
-import md5 from "js-md5"
-import VueCookies from 'vue-cookies'
+import Vue from "vue";
 import routes from 'src/router/routes'
 import VueRouter from 'vue-router'
-import {Dialog} from "quasar";
 
-Vue.prototype.$md5 = md5
-Vue.use(VueCookies)
 Vue.use(VueRouter)
 
 

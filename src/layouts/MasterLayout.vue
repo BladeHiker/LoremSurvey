@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <q-header elevated style="background: linear-gradient(145deg,#1976d2 11%,#0f477e 75%);">
       <q-toolbar>
         <q-ajax-bar
           ref="bar"
@@ -99,6 +99,16 @@
               受访者管理
             </q-item-section>
           </q-item>
+
+          <q-item clickable v-ripple @click="routeTo('/manage/user')">
+            <q-item-section avatar>
+              <q-icon name="account_circle"/>
+            </q-item-section>
+
+            <q-item-section>
+              个人中心
+            </q-item-section>
+          </q-item>
         </q-list>
       </q-scroll-area>
       <div class="fixed-bottom version-area">
@@ -131,7 +141,7 @@ export default {
       isLogin: true,
       userName: null,
       drawer: false,
-      ver: "v2.1 开发版本"
+      ver: "v2.2 开发版本"
     }
   },
   updated() {

@@ -65,8 +65,8 @@
                 <div class="text-center editable">
                   <span v-if="surveyData.desc!==''" v-html="surveyData.desc"></span>
                   <span v-else class="text-green-5"><i>点击添加问卷说明</i></span>
-                  <q-popup-edit v-model="surveyData.desc" title="编辑描述" buttons @save="changeData">
-                    <q-editor v-model="surveyData.desc" dense autofocus counter/>
+                  <q-popup-edit v-model="surveyData.desc" title="编辑描述" buttons @save="changeData" persistent>
+                    <q-editor v-model="surveyData.desc" dense autofocus counter @keyup.enter.stop/>
                   </q-popup-edit>
                 </div>
               </div>
@@ -508,7 +508,7 @@ export default {
       selected: [],
       columns: [
         {
-          name: 'id',
+          name: 'sid',
           required: true,
           label: '学号/工号',
           field: 'sid',
@@ -522,7 +522,7 @@ export default {
         {
           name: 'status', label: '状态', field: 'status', format: val => {
             if (this.surveyData.open) return "-"
-            return val === 0 ? "未发送" : "已发送"
+            return val === false ? "未发送" : "已发送"
           }
         },
       ],
