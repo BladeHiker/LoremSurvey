@@ -1,21 +1,31 @@
 <template>
-  <q-page class="flex justify-center">
+  <q-page class="flex column content-center">
+    <div class="main-btn-group">
+      <q-btn flat color="primary" icon-right="arrow_forward"
+             @click="routeTo('/manage/respondents')">
+        受访者管理
+      </q-btn>
+      <q-btn flat color="primary" icon-right="arrow_forward" @click="onCreateSurvey">
+        创建问卷
+      </q-btn>
+    </div>
     <div class="work-area">
-      <div class="manager-header">
-        <div class="text-h3">
-          问卷管理
-        </div>
-        <q-separator color="black"></q-separator>
-        <div class="main-btn-group">
-          <q-btn flat color="primary" icon-right="arrow_forward"
-                 @click="routeTo('/manage/respondents')">
-            受访者管理
-          </q-btn>
-          <q-btn flat color="primary" icon-right="arrow_forward" @click="onCreateSurvey">
-            创建问卷
-          </q-btn>
-        </div>
-      </div>
+      <!--      <div class="manager-header">-->
+      <!--        <div class="text-h3">-->
+      <!--          问卷管理-->
+      <!--        </div>-->
+      <!--        <q-separator color="black"></q-separator>-->
+      <!--        <div class="main-btn-group">-->
+      <!--          <q-btn flat color="primary" icon-right="arrow_forward"-->
+      <!--                 @click="routeTo('/manage/respondents')">-->
+      <!--            受访者管理-->
+      <!--          </q-btn>-->
+      <!--          <q-btn flat color="primary" icon-right="arrow_forward" @click="onCreateSurvey">-->
+      <!--            创建问卷-->
+      <!--          </q-btn>-->
+      <!--        </div>-->
+      <!--      </div>-->
+
       <div class="flex row surveys">
         <q-card v-for="(item,i) in surveyList" v-bind:key="i" class="survey-item">
           <q-card-section class="survey-top text-white"
@@ -36,6 +46,7 @@
               <q-icon name="fiber_manual_record" color="red"></q-icon>
               停止收集
             </div>
+            <q-icon name="description" style="opacity: 0.5" size="100px" class="absolute-bottom-right"/>
           </q-card-section>
           <q-separator dark/>
           <q-card-actions>
@@ -143,7 +154,7 @@ export default {
         startTime: null,
         stopTime: null,
         desc: "",
-        problemSet: [],
+        questionSet: [],
         emailTemplate: ""
       }).then(res => {
         this.routeTo('manage/edit/' + res.data.data.id)
@@ -170,6 +181,7 @@ export default {
   width: 300px;
   height: 215px;
   margin-bottom: 20px;
+  margin-right: 10px;
 }
 
 .survey-item:hover {
@@ -207,5 +219,18 @@ export default {
 
 .survey-void {
   width: 300px;
+  margin-right: 10px;
+}
+
+@media (max-width: 690px) {
+  .survey-item {
+    width: 80vw;
+    margin-right: 0;
+  }
+
+  .survey-void {
+    width: 80vw;
+    margin-right: 0;
+  }
 }
 </style>

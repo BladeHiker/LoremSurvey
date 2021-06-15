@@ -47,6 +47,11 @@
           <template v-slot:after>
             <q-img style="cursor: pointer" @click="getCaptchaData" :src="'data:image/png;base64,'+captchaImg"
                    width="100px" height="50px">
+              <template v-slot:error>
+                <div class="absolute-full flex flex-center bg-grey">
+                  <q-icon name="refresh" size="22px"/>
+                </div>
+              </template>
             </q-img>
           </template>
         </q-input>
@@ -79,7 +84,8 @@ export default {
         }
       },
       loading: false,
-      captchaImg: null
+      captchaImg: null,
+      reloadCaptcha: null
     };
   },
   created() {
@@ -91,6 +97,13 @@ export default {
         this.loginForm.captcha.code = ""
         this.loginForm.captcha.id = res.data.data.id
         this.captchaImg = res.data.data.base64Data
+        if (this.reloadCaptcha) {
+          clearTimeout(this.reloadCaptcha)
+        }
+        this.reloadCaptcha = setTimeout(() => {
+          this.captchaImg = ""
+        }, 40000)
+
       })
     },
     toReg() {

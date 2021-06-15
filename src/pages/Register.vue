@@ -10,6 +10,7 @@
         <br/>
         <q-input
           label="用户名"
+          name="username"
           v-model="registerForm.username"
           maxlength="50"
           lazy-rules
@@ -52,6 +53,7 @@
         </q-input>
         <q-input
           label="密码"
+          name="password"
           v-model="registerForm.password"
           maxlength="20"
           autocomplete="new-password"

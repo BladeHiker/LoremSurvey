@@ -10,14 +10,26 @@
         />
         <q-btn dense flat round icon="menu" @click="drawer = !drawer" v-if="isLogin"/>
         <q-toolbar-title shrink>
-
-          <q-btn flat size="20px" no-caps padding="8px 5px" @click="goHome">LoremSurvey</q-btn>
-          <span class="version ellipsis gt-xs"> {{ ver }}</span>
-          <!--          <span >{{this.$route.meta.title}}</span>-->
+        <span class="flex inline items-center">
+<!--          <q-icon name="widgets" color="white" size="18px"/>-->
+          &nbsp;
+          <span style="font-size: 15px">{{ this.$route.meta.name }}</span>
+        </span>
         </q-toolbar-title>
         <q-toolbar-title>
-          <div class="text-center center-title">
-            <!--            <span>问卷编辑</span>-->
+          <div class="text-center xs-hide">
+            <q-btn flat size="20px" no-caps padding="8px 5px" @click="goHome">
+              <span class="flex row flex-center">
+                    <img
+                      alt="LoremSurvey"
+                      src="~assets/text-logo.svg"
+                      class="logo-img"
+                    >
+                <!--                <span class="logo">Lorem<span class="logo-white">Survey</span></span>-->
+                <span class="version ellipsis gt-sm">  &nbsp; &nbsp;{{ ver }}</span></span>
+            </q-btn>
+
+            <!--          <span >{{this.$route.meta.title}}</span>-->
           </div>
         </q-toolbar-title>
         <q-btn-dropdown no-caps icon="account_circle" flat size="15px" padding="12px">
@@ -141,7 +153,7 @@ export default {
       isLogin: true,
       userName: null,
       drawer: false,
-      ver: "v2.2 开发版本"
+      ver: "v2.3 开发版本"
     }
   },
   updated() {
@@ -193,8 +205,29 @@ export default {
 }
 
 .version {
+  padding-top: 3px;
   font-size: small;
   color: rgba(221, 221, 221, 0.62);
   word-wrap: break-word;
+}
+
+.logo-white {
+  background-color: white;
+  color: #1667B8;
+}
+
+.logo {
+  padding: 0 5px;
+  line-height: 22px;
+}
+
+.logo-img {
+  height: 30px;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -o-crisp-edges;
+  /*image-rendering:-webkit-optimize-contrast;*/
+  image-rendering: auto;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
 }
 </style>

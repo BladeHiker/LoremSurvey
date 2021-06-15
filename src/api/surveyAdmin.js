@@ -12,7 +12,7 @@ import service from '@/utils/request'
 //    startTime string
 //    stopTime string
 //    desc string
-//    problemSet {}
+//    questionSet {}
 // }
 export const createSurveyItem = (data) => {
   return service({
@@ -35,7 +35,7 @@ export const createSurveyItem = (data) => {
 //    startTime string
 //    stopTime string
 //    desc string
-//    problemSet {}
+//    questionSet {}
 // }
 export const modifySurveyItem = (data) => {
   return service({
@@ -83,7 +83,7 @@ export const getSurveyList = (data) => {
 //     "desc": "沈阳航空航天大学 软件工程LoremIpsum Team 调查问卷",
 //     "startTime": "2021-05-01T00:00:00Z",
 //     "stopTime": "2021-08-01T00:00:00Z",
-//     "problemSet": [
+//     "questionSet": [
 //   ]
 // },
 //   "message": "send success"

@@ -38,15 +38,15 @@
                 </template>
               </q-banner>
 
-              <!--              <q-banner dense inline-actions class="text-white bg-orange q-mb-md" v-else-if="noRequireProblem">-->
+              <!--              <q-banner dense inline-actions class="text-white bg-orange q-mb-md" v-else-if="noRequireQuestion">-->
               <!--                此问卷不包含必答题。-->
               <!--                <template v-slot:avatar>-->
               <!--                  <q-icon name="warning" color="white"/>-->
               <!--                </template>-->
               <!--              </q-banner>-->
-              <!--              <q-banner dense inline-actions class="text-white bg-orange q-mb-md" v-if="voidProblem||noOptionProblem">-->
-              <!--                <div v-if="voidProblem">问卷中存在无标题题目</div>-->
-              <!--                <div v-if="noOptionProblem">问卷中存在无选项选择题</div>-->
+              <!--              <q-banner dense inline-actions class="text-white bg-orange q-mb-md" v-if="voidQuestion||noOptionQuestion">-->
+              <!--                <div v-if="voidQuestion">问卷中存在无标题题目</div>-->
+              <!--                <div v-if="noOptionQuestion">问卷中存在无选项选择题</div>-->
               <!--                <template v-slot:avatar style="height: 100%">-->
               <!--                  <q-icon name="priority_high" color="white"/>-->
               <!--                </template>-->
@@ -72,17 +72,17 @@
               </div>
               <div class="column">
                 <transition-group name="fade">
-                  <div v-for="(problem,pid) in surveyData.problemSet" :key="pid+1" class="ques-section">
-                    <div v-if="problem.type===0">
+                  <div v-for="(question,pid) in surveyData.questionSet" :key="pid+1" class="ques-section">
+                    <div v-if="question.type===0">
                       <div v-if="editing!==pid" @click="editing=pid;isEditing=true" class="editable">
-                        <div class="float-right q-pa-sm" v-if="!validProblem(pid)">
+                        <div class="float-right q-pa-sm" v-if="!validQuestion(pid)">
                           <q-icon name="error" color="red" size="25px"></q-icon>
                         </div>
                         <div class="text-h6 ques-title-large">
                           <b>{{ pid + 1|formatIndex }} / </b>
-                          <span v-if="problem.title!==''">{{ problem.title }}</span>
+                          <span v-if="question.title!==''">{{ question.title }}</span>
                           <span v-else class="text-green-5"><i>点击编辑问题</i></span>
-                          <span v-if="problem.need" class="text-red"> *</span>
+                          <span v-if="question.need" class="text-red"> *</span>
                         </div>
                         <q-input placeholder="请输入"
                                  :dense="true"
@@ -93,30 +93,30 @@
                       <div v-if="editing===pid">
                         <div class="text-h6 ques-title-large">
                           <b>{{ pid + 1|formatIndex }} / </b>
-                          <input v-model="problem.title" autofocus="autofocus" placeholder="输入问题" minlength="1"
+                          <input v-model="question.title" autofocus="autofocus" placeholder="输入问题" minlength="1"
                                  maxlength="128"
                                  class="input-title"/>
-                          <span v-if="problem.need" class="text-red"> *</span>
+                          <span v-if="question.need" class="text-red"> *</span>
                           <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
-                            <q-toggle label="必填项" dense v-model="problem.need"/>
-                            <q-btn flat dense icon="arrow_upward" label="上移" @click="upProblem(pid)"/>
-                            <q-btn flat dense icon="arrow_downward" label="下移" @click="downProblem(pid)"/>
-                            <q-btn flat dense icon="close" label="删除" @click="delProblem(pid)"/>
+                            <q-toggle label="必填项" dense v-model="question.need"/>
+                            <q-btn flat dense icon="arrow_upward" label="上移" @click="upQuestion(pid)"/>
+                            <q-btn flat dense icon="arrow_downward" label="下移" @click="downQuestion(pid)"/>
+                            <q-btn flat dense icon="close" label="删除" @click="delQuestion(pid)"/>
                             <q-btn flat dense icon="check" label="完成" @click="editing=-1"/>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div v-else-if="problem.type===1">
+                    <div v-else-if="question.type===1">
                       <div class="editable" @click="editing=pid;isEditing=true;onAddOption=pid" v-if="editing!==pid">
-                        <div class="float-right q-pa-sm" v-if="!validProblem(pid)">
+                        <div class="float-right q-pa-sm" v-if="!validQuestion(pid)">
                           <q-icon name="error" color="red" size="25px"></q-icon>
                         </div>
                         <div class="text-h6 ques-title">
                           <b>{{ pid + 1 |formatIndex }} / </b>
-                          <span v-if="problem.title!==''">{{ problem.title }}</span>
+                          <span v-if="question.title!==''">{{ question.title }}</span>
                           <span v-else class="text-green-5"><i>点击编辑问题</i></span>
-                          <span v-if="problem.need" class="text-red"> *</span>
+                          <span v-if="question.need" class="text-red"> *</span>
                         </div>
                         <q-field
                           borderless
@@ -124,7 +124,7 @@
                         >
                           <template v-slot:control>
                             <q-option-group
-                              :options="problem.options"
+                              :options="question.options"
                               color="primary"
                               type="radio"
                               v-model="answer[pid]"
@@ -136,28 +136,28 @@
                       <div v-else>
                         <div class="text-h6 ques-title">
                           <b>{{ pid + 1 |formatIndex }} / </b>
-                          <input v-model="problem.title" autofocus="autofocus" placeholder="输入问题" minlength="1"
+                          <input v-model="question.title" autofocus="autofocus" placeholder="输入问题" minlength="1"
                                  maxlength="128"
-                                 class="input-title" :style="{'border-color': problem.title===''? '#C10015':'#1976D2'}">
-                          <span v-if="problem.need" class="text-red"> *</span>
+                                 class="input-title" :style="{'border-color': question.title===''? '#C10015':'#1976D2'}">
+                          <span v-if="question.need" class="text-red"> *</span>
                           <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
-                            <q-toggle label="必填项" dense v-model="problem.need"/>
-                            <q-btn flat dense icon="arrow_upward" label="上移" @click="upProblem(pid)"/>
-                            <q-btn flat dense icon="arrow_downward" label="下移" @click="downProblem(pid)"/>
-                            <q-btn flat dense icon="close" label="删除" @click="delProblem(pid)"/>
+                            <q-toggle label="必填项" dense v-model="question.need"/>
+                            <q-btn flat dense icon="arrow_upward" label="上移" @click="upQuestion(pid)"/>
+                            <q-btn flat dense icon="arrow_downward" label="下移" @click="downQuestion(pid)"/>
+                            <q-btn flat dense icon="close" label="删除" @click="delQuestion(pid)"/>
                             <q-btn flat dense icon="check" label="完成" @click="editing=-1"/>
                           </div>
                         </div>
                         <q-list bordered>
                           <q-item-label header>选项列表</q-item-label>
                           <q-separator/>
-                          <q-item v-if="problem.options.length===0">
+                          <q-item v-if="question.options.length===0">
                             <div class="q-ma-sm">
                               <q-icon name="error" color="red"/>
                               <span>&nbsp;请添加选项</span>
                             </div>
                           </q-item>
-                          <q-item v-for="(item,i) in problem.options" :key="i">
+                          <q-item v-for="(item,i) in question.options" :key="i">
                             <q-item-section>
                               <div>
                                 <q-chip dense square>{{ i + 1 }}</q-chip>
@@ -302,18 +302,18 @@
                 </q-card>
               </div>
               <div class="column">
-                <div v-for="(problem,pid) in resultData.problemSet" :key="pid" class="ques-section">
-                  <div v-if="problem.type===0">
+                <div v-for="(question,pid) in resultData.questionSet" :key="pid" class="ques-section">
+                  <div v-if="question.type===0">
                     <div>
                       <div class="text-h6 ques-title-large">
                         <b>{{ pid + 1|formatIndex }} / </b>
-                        <span v-if="problem.title!==''">{{ problem.title }}</span>
+                        <span v-if="question.title!==''">{{ question.title }}</span>
                         <span v-else class="text-green-5"><i>无标题</i></span>
-                        <span v-if="problem.need" class="text-red"> *</span>
+                        <span v-if="question.need" class="text-red"> *</span>
                       </div>
                       <q-list bordered separator
                               v-if="showAllAns[pid]!==true">
-                        <q-item v-for="(ans,i) in previewList(problem.answer)" :key="i">
+                        <q-item v-for="(ans,i) in previewList(question.answer)" :key="i">
                           <q-item-section>{{ Object.keys(ans)[0] }}</q-item-section>
                           <q-item-section side>
                             <div class="text-grey-8 q-gutter-xs">
@@ -321,18 +321,18 @@
                             </div>
                           </q-item-section>
                         </q-item>
-                        <q-item v-if="!problem.frequency || problem.frequency===0">
+                        <q-item v-if="!question.frequency || question.frequency===0">
                           <div class="q-ma-sm">
                             <q-icon name="warning"/>
                             <span>&nbsp;&nbsp;暂无作答</span>
                           </div>
                         </q-item>
-                        <q-item clickable @click="switchShow(pid)" v-if="problem.answer.length>5">
+                        <q-item clickable @click="switchShow(pid)" v-if="question.answer.length>5">
                           <q-item-section class="text-center text-primary">显示全部</q-item-section>
                         </q-item>
                       </q-list>
                       <q-list bordered separator v-else>
-                        <q-item v-for="(ans,i) in problem.answer" :key="i">
+                        <q-item v-for="(ans,i) in question.answer" :key="i">
                           <q-item-section>{{ Object.keys(ans)[0] }}</q-item-section>
                           <q-item-section side>
                             <div class="text-grey-8 q-gutter-xs">
@@ -340,7 +340,7 @@
                             </div>
                           </q-item-section>
                         </q-item>
-                        <q-item v-if="!problem.frequency || problem.frequency===0">
+                        <q-item v-if="!question.frequency || question.frequency===0">
                           <div class="q-ma-sm">
                             <q-icon name="warning"/>
                             <span>&nbsp;&nbsp;暂无作答</span>
@@ -352,28 +352,28 @@
                       </q-list>
                     </div>
                   </div>
-                  <div v-else-if="problem.type===1">
+                  <div v-else-if="question.type===1">
                     <div>
                       <div class="text-h6 ques-title">
                         <b>{{ pid + 1 |formatIndex }} / </b>
-                        <span v-if="problem.title!==''">{{ problem.title }}</span>
+                        <span v-if="question.title!==''">{{ question.title }}</span>
                         <span v-else class="text-green-5"><i>无标题</i></span>
-                        <span v-if="problem.need" class="text-red"> *</span>
+                        <span v-if="question.need" class="text-red"> *</span>
                       </div>
                       <q-list bordered separator>
-                        <q-item v-for="(option,i) in problem.options" :key="i">
+                        <q-item v-for="(option,i) in question.options" :key="i">
                           <q-item-section>
                             {{ option.label }}
                             <q-linear-progress
-                              :value="problem.frequency&&problem.answer? ((option.label in problem.answer)?problem.answer[option.label]:0)/problem.frequency:0"/>
+                              :value="question.frequency&&question.answer? ((option.label in question.answer)?question.answer[option.label]:0)/question.frequency:0"/>
                           </q-item-section>
                           <q-item-section side>
                             <div class="text-grey-8 q-gutter-xs">
-                              {{ option.label in problem.answer ? problem.answer[option.label] : '0' }}
+                              {{ option.label in question.answer ? question.answer[option.label] : '0' }}
                             </div>
                           </q-item-section>
                         </q-item>
-                        <q-item v-if="problem.options.length===0">
+                        <q-item v-if="question.options.length===0">
                           <div class="q-ma-sm">
                             <q-icon name="warning"/>
                             <span>&nbsp;&nbsp;未设置选项</span>
@@ -499,7 +499,7 @@ export default {
       surveyData: {
         title: "",
         desc: "",
-        problemSet: []
+        questionSet: []
       },
       answer: [],
       editing: null,
@@ -530,7 +530,7 @@ export default {
       openLink: null,
       resultData: {
         frequency: '-',
-        problemSet: [],
+        questionSet: [],
         desc: "",
         id: "",
         open: null,
@@ -558,23 +558,23 @@ export default {
       return this.surveyData.startTime !== null
     },
     voidSurvey() {
-      return this.surveyData.problemSet.length === 0
+      return this.surveyData.questionSet.length === 0
     },
-    voidProblem() {
-      for (let i = this.surveyData.problemSet.length - 1; i >= 0; --i) {
-        if (this.surveyData.problemSet[i].title === '') return true
+    voidQuestion() {
+      for (let i = this.surveyData.questionSet.length - 1; i >= 0; --i) {
+        if (this.surveyData.questionSet[i].title === '') return true
       }
       return false
     },
-    noRequireProblem() {
-      for (let i = this.surveyData.problemSet.length - 1; i >= 0; --i) {
-        if (this.surveyData.problemSet[i].need) return false
+    noRequireQuestion() {
+      for (let i = this.surveyData.questionSet.length - 1; i >= 0; --i) {
+        if (this.surveyData.questionSet[i].need) return false
       }
       return true
     },
-    noOptionProblem() {
-      for (let i = this.surveyData.problemSet.length - 1; i >= 0; --i) {
-        if (this.surveyData.problemSet[i].type === 1 && this.surveyData.problemSet[i].options.length === 0) return true
+    noOptionQuestion() {
+      for (let i = this.surveyData.questionSet.length - 1; i >= 0; --i) {
+        if (this.surveyData.questionSet[i].type === 1 && this.surveyData.questionSet[i].options.length === 0) return true
       }
       return false
     }
@@ -587,25 +587,25 @@ export default {
       if (!Array.isArray(list)) return null
       return list.slice(0, 5)
     },
-    validProblem(pid) {
-      if (this.surveyData.problemSet[pid].type === 0) {
-        if (this.surveyData.problemSet[pid].title === '') return false
+    validQuestion(pid) {
+      if (this.surveyData.questionSet[pid].type === 0) {
+        if (this.surveyData.questionSet[pid].title === '') return false
       } else {
-        if (this.surveyData.problemSet[pid].title === '') return false
-        if (this.surveyData.problemSet[pid].options.length === 0) return false
+        if (this.surveyData.questionSet[pid].title === '') return false
+        if (this.surveyData.questionSet[pid].options.length === 0) return false
       }
       return true
     },
     async getResponse() {
       const res = await getSurveyResult({id: this.id})
       this.resultData = res.data.data
-      this.resultData.problemSet.sort((a, b) => {
+      this.resultData.questionSet.sort((a, b) => {
         return a.index > b.index ? 1 : -1
       })
-      for (let i = this.resultData.problemSet.length - 1; i >= 0; --i) {
+      for (let i = this.resultData.questionSet.length - 1; i >= 0; --i) {
         this.showAllAns.push(false)
-        if (this.resultData.problemSet[i].type === 0)
-          this.resultData.problemSet[i].answer.sort((a, b) => {
+        if (this.resultData.questionSet[i].type === 0)
+          this.resultData.questionSet[i].answer.sort((a, b) => {
             return Object.values(a)[0] < Object.values(b)[0] ? 1 : -1
           })
       }
@@ -613,74 +613,74 @@ export default {
     switchStime() {
 
     },
-    upProblem(pid) {
+    upQuestion(pid) {
       if (pid) {
-        const t = this.surveyData.problemSet[pid - 1].index
-        this.surveyData.problemSet[pid - 1].index = this.surveyData.problemSet[pid].index
-        this.surveyData.problemSet[pid].index = t
-        this.sortProblems()
+        const t = this.surveyData.questionSet[pid - 1].index
+        this.surveyData.questionSet[pid - 1].index = this.surveyData.questionSet[pid].index
+        this.surveyData.questionSet[pid].index = t
+        this.sortQuestions()
         --this.editing
       }
     }
     ,
-    downProblem(pid) {
-      if (pid + 1 !== this.surveyData.problemSet.length) {
-        const t = this.surveyData.problemSet[pid].index
-        this.surveyData.problemSet[pid].index = this.surveyData.problemSet[pid + 1].index
-        this.surveyData.problemSet[pid + 1].index = t
-        this.sortProblems()
+    downQuestion(pid) {
+      if (pid + 1 !== this.surveyData.questionSet.length) {
+        const t = this.surveyData.questionSet[pid].index
+        this.surveyData.questionSet[pid].index = this.surveyData.questionSet[pid + 1].index
+        this.surveyData.questionSet[pid + 1].index = t
+        this.sortQuestions()
         ++this.editing
       }
     }
     ,
-    delProblem(pid) {
+    delQuestion(pid) {
       console.log(pid)
-      for (let i = pid; i < this.surveyData.problemSet.length - 1; ++i) {
-        this.surveyData.problemSet[i] = this.surveyData.problemSet[i + 1]
-        this.surveyData.problemSet[i].index = i + 1
+      for (let i = pid; i < this.surveyData.questionSet.length - 1; ++i) {
+        this.surveyData.questionSet[i] = this.surveyData.questionSet[i + 1]
+        this.surveyData.questionSet[i].index = i + 1
       }
       this.editing = -1
-      this.surveyData.problemSet.splice(this.surveyData.problemSet.length - 1, 1)
+      this.surveyData.questionSet.splice(this.surveyData.questionSet.length - 1, 1)
     }
     ,
     upOption(pid, oid) {
       if (oid > 0) {
-        const t = this.surveyData.problemSet[pid].options[oid - 1].value
-        this.surveyData.problemSet[pid].options[oid - 1].value = this.surveyData.problemSet[pid].options[oid].value
-        this.surveyData.problemSet[pid].options[oid].value = t
-        this.surveyData.problemSet[pid].options.sort((a, b) => {
+        const t = this.surveyData.questionSet[pid].options[oid - 1].value
+        this.surveyData.questionSet[pid].options[oid - 1].value = this.surveyData.questionSet[pid].options[oid].value
+        this.surveyData.questionSet[pid].options[oid].value = t
+        this.surveyData.questionSet[pid].options.sort((a, b) => {
           return a.value < b.value ? 1 : -1
         })
       }
     }
     ,
     downOption(pid, oid) {
-      if (this.surveyData.problemSet[pid].options.length > oid + 1) {
-        const t = this.surveyData.problemSet[pid].options[oid + 1].value
-        this.surveyData.problemSet[pid].options[oid + 1].value = this.surveyData.problemSet[pid].options[oid].value
-        this.surveyData.problemSet[pid].options[oid].value = t
-        this.surveyData.problemSet[pid].options.sort((a, b) => {
+      if (this.surveyData.questionSet[pid].options.length > oid + 1) {
+        const t = this.surveyData.questionSet[pid].options[oid + 1].value
+        this.surveyData.questionSet[pid].options[oid + 1].value = this.surveyData.questionSet[pid].options[oid].value
+        this.surveyData.questionSet[pid].options[oid].value = t
+        this.surveyData.questionSet[pid].options.sort((a, b) => {
           return a.value < b.value ? 1 : -1
         })
       }
     }
     ,
     delOption(pid, oid) {
-      for (let i = oid; i < this.surveyData.problemSet[pid].options.length - 1; ++i) {
-        this.surveyData.problemSet[pid].options[i] = this.surveyData.problemSet[pid].options[i + 1]
+      for (let i = oid; i < this.surveyData.questionSet[pid].options.length - 1; ++i) {
+        this.surveyData.questionSet[pid].options[i] = this.surveyData.questionSet[pid].options[i + 1]
       }
-      this.surveyData.problemSet[pid].options.splice(this.surveyData.problemSet[pid].options.length - 1, 1)
+      this.surveyData.questionSet[pid].options.splice(this.surveyData.questionSet[pid].options.length - 1, 1)
     }
     ,
     addOption(pid) {
-      for (let i = this.surveyData.problemSet[pid].options.length - 1; i >= 0; --i) {
-        if (this.surveyData.problemSet[pid].options[i].label === this.templateOptions.label) {
+      for (let i = this.surveyData.questionSet[pid].options.length - 1; i >= 0; --i) {
+        if (this.surveyData.questionSet[pid].options[i].label === this.templateOptions.label) {
           Notify.create({message: "选项重复，已合并", color: 'secondary', position: 'top', timeout: 1500})
           this.templateOptions.label = ""
           return
         }
       }
-      this.surveyData.problemSet[pid].options.push({
+      this.surveyData.questionSet[pid].options.push({
         label: this.templateOptions.label,
         value: this.templateOptions.label
       })
@@ -707,8 +707,8 @@ export default {
       if (this.isEditing) this.onSave()
     }
     ,
-    sortProblems() {
-      this.surveyData.problemSet.sort((a, b) => {
+    sortQuestions() {
+      this.surveyData.questionSet.sort((a, b) => {
         return a.index > b.index ? 1 : -1
       })
     }
@@ -720,10 +720,10 @@ export default {
         return
       }
       this.surveyData = res.data.data
-      this.sortProblems()
-      for (let i = 0; i < this.surveyData.problemSet.length; i++) {
-        if (this.surveyData.problemSet[i].type === 1) {
-          this.surveyData.problemSet[i].options.sort((a, b) => {
+      this.sortQuestions()
+      for (let i = 0; i < this.surveyData.questionSet.length; i++) {
+        if (this.surveyData.questionSet[i].type === 1) {
+          this.surveyData.questionSet[i].options.sort((a, b) => {
             return a.value < b.value ? 1 : -1
           })
         }
@@ -776,9 +776,9 @@ export default {
     ,
     addChoiceQuestion() {
       window.scrollBy(0, document.body.scrollHeight)
-      this.surveyData.problemSet.push({
+      this.surveyData.questionSet.push({
           type: 1,
-          index: this.surveyData.problemSet.length + 1,
+          index: this.surveyData.questionSet.length + 1,
           need: false,
           title: "",
           desc: "",
@@ -788,9 +788,9 @@ export default {
     }
     ,
     addBlankQuestion() {
-      this.surveyData.problemSet.push({
+      this.surveyData.questionSet.push({
         type: 0,
-        index: this.surveyData.problemSet.length + 1,
+        index: this.surveyData.questionSet.length + 1,
         need: false,
         title: "",
         desc: ""

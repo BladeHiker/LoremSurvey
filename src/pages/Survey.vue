@@ -22,13 +22,14 @@
         class="column"
         @validation-error="validError"
       >
-        <div v-for="(problem,i) in (demoMode ? sdata.problemSet: surveyData.problemSet)" :key="i" class="ques-section">
-          <div v-if="problem.type===0">
+        <div v-for="(question,i) in (demoMode ? sdata.questionSet: surveyData.questionSet)" :key="i"
+             class="ques-section">
+          <div v-if="question.type===0">
             <div class="text-h6 ques-title-large">
-              <b>{{ problem.index|formatIndex }} / </b>
-              <span v-if="problem.title!==''">{{ problem.title }}</span>
+              <b>{{ question.index|formatIndex }} / </b>
+              <span v-if="question.title!==''">{{ question.title }}</span>
               <span v-else class="text-italic text-grey">(未设置题目)</span>
-              <span v-if="problem.need" class="text-red"> *</span>
+              <span v-if="question.need" class="text-red"> *</span>
             </div>
             <q-input
               v-if="demoMode"
@@ -37,7 +38,7 @@
               :dense="true"
               filled
               v-model="answer[i]"
-              :rules="[val => !problem.need||(val!=null&&val!='') ||'必填项']"
+              :rules="[val => !question.need||(val!=null&&val!='') ||'必填项']"
             />
             <q-input
               v-else
@@ -45,29 +46,29 @@
               placeholder="请输入"
               :dense="true"
               filled
-              v-model="answer.problemSet[i].answer"
-              :rules="[val => !problem.need||(val!=null&&val!='') ||'必填项']"
+              v-model="answer.questionSet[i].answer"
+              :rules="[val => !question.need||(val!=null&&val!='') ||'必填项']"
               @keydown.enter.prevent
             />
           </div>
-          <div v-else-if="problem.type===1">
+          <div v-else-if="question.type===1">
             <div class="text-h6 ques-title">
-              <b>{{ problem.index |formatIndex }} / </b>
-              <span v-if="problem.title!==''">{{ problem.title }}</span>
+              <b>{{ question.index |formatIndex }} / </b>
+              <span v-if="question.title!==''">{{ question.title }}</span>
               <span v-else class="text-italic text-grey">(未设置题目)</span>
-              <span v-if="problem.need" class="text-red"> *</span>
+              <span v-if="question.need" class="text-red"> *</span>
             </div>
             <q-field
               v-if="demoMode"
               v-model="answer[i]"
-              :rules="[val => !problem.need||val!=null||'必填项']"
+              :rules="[val => !question.need||val!=null||'必填项']"
               borderless
               :disable="submitted===1"
             >
               <template v-slot:control>
                 <q-option-group
                   v-model="answer[i]"
-                  :options="problem.options"
+                  :options="question.options"
                   color="primary"
                   type="radio"
                 />
@@ -75,15 +76,15 @@
             </q-field>
             <q-field
               v-else
-              v-model="answer.problemSet[i].answer"
-              :rules="[val => !problem.need||val!=null||'必填项']"
+              v-model="answer.questionSet[i].answer"
+              :rules="[val => !question.need||val!=null||'必填项']"
               borderless
               :disable="submitted===1"
             >
               <template v-slot:control>
                 <q-option-group
-                  v-model="answer.problemSet[i].answer"
-                  :options="problem.options"
+                  v-model="answer.questionSet[i].answer"
+                  :options="question.options"
                   color="primary"
                   type="radio"
                 />
@@ -136,10 +137,10 @@ export default {
       surveyData: {
         title: "",
         desc: "",
-        problemSet: []
+        questionSet: []
       },
       answer: {
-        problemSet: []
+        questionSet: []
       },
       submitted: 0,
       res: null,
@@ -165,17 +166,17 @@ export default {
       document.title = this.surveyData.title + " -LoremSurvey"
       if (!this.surveyData.running) this.submitted = 1
 
-      this.surveyData.problemSet.sort((a, b) => {
+      this.surveyData.questionSet.sort((a, b) => {
         return a.index > b.index ? 1 : -1
       })
 
-      for (let i = 0; i < this.surveyData.problemSet.length; ++i) {
-        if (this.surveyData.problemSet[i].type === 1) {
+      for (let i = 0; i < this.surveyData.questionSet.length; ++i) {
+        if (this.surveyData.questionSet[i].type === 1) {
           //选择题
-          this.answer.problemSet.push({index: i + 1, answer: null, id: this.surveyData.problemSet[i].id})
-        } else if (this.surveyData.problemSet[i].type === 0) {
+          this.answer.questionSet.push({index: i + 1, answer: null, id: this.surveyData.questionSet[i].id})
+        } else if (this.surveyData.questionSet[i].type === 0) {
           //填空题
-          this.answer.problemSet.push({index: i + 1, answer: null, id: this.surveyData.problemSet[i].id})
+          this.answer.questionSet.push({index: i + 1, answer: null, id: this.surveyData.questionSet[i].id})
         }
       }
     }
@@ -200,7 +201,7 @@ export default {
             return
           }
           this.submitted = -1
-          submitSurvey({sessionid: this.sessionId}, {problemSet: this.answer.problemSet}).then((res) => {
+          submitSurvey({sessionid: this.sessionId}, {questionSet: this.answer.questionSet}).then((res) => {
             if (res.data.code === 0) {
               this.submitted = 1
             } else {
@@ -229,7 +230,7 @@ export default {
 }
 
 .paper-title {
-
+  color: #3c4858;
 }
 
 .paper-time {
@@ -247,6 +248,10 @@ export default {
 
 .ques-title {
   margin-bottom: 8px;
+}
+
+.ques-title b, .ques-title-large b {
+  color: #2c3e50;
 }
 
 .ques-title-large {
