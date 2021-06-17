@@ -31,6 +31,18 @@
         </q-timeline-entry>
 
         <q-timeline-entry
+          title="V2.4"
+          subtitle="2021年6月17日"
+        >
+          <div>
+            更新迭代
+            <ul>
+              <li>新增：修改密码、忘记密码</li>
+              <li>界面：答题界面微调</li>
+            </ul>
+          </div>
+        </q-timeline-entry>
+        <q-timeline-entry
           title="V2.3"
           subtitle="2021年6月15日"
         >

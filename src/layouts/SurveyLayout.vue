@@ -28,7 +28,7 @@ export default {
 </script>
 <style scoped>
 .main-bg {
-  background-color: #F2F2F2;
+  background-color: #F2F5FD;
   overflow: hidden;
 }
 </style>

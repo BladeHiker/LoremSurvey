@@ -114,8 +114,9 @@ export default {
     },
     onLogin() {
       this.loading = true
-      this.loginForm.password = this.$md5(this.loginForm.password)
-      login(this.loginForm).then(res => {
+      let form = JSON.parse(JSON.stringify(this.loginForm))
+      form.password = this.$md5(this.loginForm.password)
+      login(form).then(res => {
         if (res.data.code === 0) {
           //登陆成功
           this.loading = false

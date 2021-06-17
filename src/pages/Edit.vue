@@ -138,7 +138,8 @@
                           <b>{{ pid + 1 |formatIndex }} / </b>
                           <input v-model="question.title" autofocus="autofocus" placeholder="输入问题" minlength="1"
                                  maxlength="128"
-                                 class="input-title" :style="{'border-color': question.title===''? '#C10015':'#1976D2'}">
+                                 class="input-title"
+                                 :style="{'border-color': question.title===''? '#C10015':'#1976D2'}">
                           <span v-if="question.need" class="text-red"> *</span>
                           <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
                             <q-toggle label="必填项" dense v-model="question.need"/>
@@ -239,8 +240,9 @@
               <q-icon name="wifi_tethering"/>
             </template>
             此问卷是<b>开放问卷</b>，可使用如下链接匿名作答。
+            <div v-if="!surveyData.running" class="text-grey-3 text-italic">* 问卷暂停回收，链接仅提供预览，答题结果不会记录</div>
             <q-card class="q-mt-sm q-pa-md text-center text-italic" style="max-width: 100vw" flat>
-              <a :href="openLink" class="q-link text-blue-7">
+              <a :href="openLink" target="_blank" class="q-link text-blue-7">
                 <span style="word-wrap: anywhere;word-break: break-all">
                 {{ openLink }}
                 </span>

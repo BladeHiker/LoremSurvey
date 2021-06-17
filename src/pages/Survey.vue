@@ -1,5 +1,5 @@
 <template>
-  <q-page class="main-con">
+  <q-page class="main-con " :class="{'flex flex-center column':!showQuestions}">
     <div v-if="loading" class="flex flex-center text-secondary text-h7">
       <q-inner-loading showing>
         <q-spinner-gears size="50px" color="secondary"/>
@@ -7,101 +7,116 @@
         加载中...
       </q-inner-loading>
     </div>
-    <div v-else-if="demoMode || surveyData.statusCode===103">
+    <div class="flex column items-stretch" v-else-if="demoMode || surveyData.statusCode===103">
       <div class="paper-header">
         <div class="text-h4 text-center paper-title">{{ demoMode ? sdata.title : surveyData.title }}</div>
-        <div class="text-center paper-time" v-if="$route.params.token">ID:{{ $route.params.token }}</div>
+        <div class="text-center paper-time" v-if="$route.params.token">ID:{{ $route.params.token.toUpperCase() }}</div>
         <br>
-        <div class="text-center" v-html="demoMode?sdata.desc : surveyData.desc"></div>
+        <div v-html="demoMode?sdata.desc : surveyData.desc"></div>
       </div>
-      <q-form
-        ref="surveyForm"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-        class="column"
-        @validation-error="validError"
-      >
-        <div v-for="(question,i) in (demoMode ? sdata.questionSet: surveyData.questionSet)" :key="i"
-             class="ques-section">
-          <div v-if="question.type===0">
-            <div class="text-h6 ques-title-large">
-              <b>{{ question.index|formatIndex }} / </b>
-              <span v-if="question.title!==''">{{ question.title }}</span>
-              <span v-else class="text-italic text-grey">(未设置题目)</span>
-              <span v-if="question.need" class="text-red"> *</span>
-            </div>
-            <q-input
-              v-if="demoMode"
-              :disable="submitted===1"
-              placeholder="请输入"
-              :dense="true"
-              filled
-              v-model="answer[i]"
-              :rules="[val => !question.need||(val!=null&&val!='') ||'必填项']"
-            />
-            <q-input
-              v-else
-              :disable="submitted===1"
-              placeholder="请输入"
-              :dense="true"
-              filled
-              v-model="answer.questionSet[i].answer"
-              :rules="[val => !question.need||(val!=null&&val!='') ||'必填项']"
-              @keydown.enter.prevent
-            />
-          </div>
-          <div v-else-if="question.type===1">
-            <div class="text-h6 ques-title">
-              <b>{{ question.index |formatIndex }} / </b>
-              <span v-if="question.title!==''">{{ question.title }}</span>
-              <span v-else class="text-italic text-grey">(未设置题目)</span>
-              <span v-if="question.need" class="text-red"> *</span>
-            </div>
-            <q-field
-              v-if="demoMode"
-              v-model="answer[i]"
-              :rules="[val => !question.need||val!=null||'必填项']"
-              borderless
-              :disable="submitted===1"
-            >
-              <template v-slot:control>
-                <q-option-group
-                  v-model="answer[i]"
-                  :options="question.options"
-                  color="primary"
-                  type="radio"
-                />
-              </template>
-            </q-field>
-            <q-field
-              v-else
-              v-model="answer.questionSet[i].answer"
-              :rules="[val => !question.need||val!=null||'必填项']"
-              borderless
-              :disable="submitted===1"
-            >
-              <template v-slot:control>
-                <q-option-group
-                  v-model="answer.questionSet[i].answer"
-                  :options="question.options"
-                  color="primary"
-                  type="radio"
-                />
-              </template>
-            </q-field>
-          </div>
-        </div>
-        <q-btn
-          :label="submitted===1?'提交成功': '提交'"
-          :color="submitted===1?'secondary': 'primary'"
-          class="flex-center submit-btn"
-          :disable="submitted!==0"
-          :loading="submitted===-1"
-          @click="submit"
-        />
+      <div class="text-center q-pa-lg" v-if="!showQuestions">
+        <q-space/>
+        <q-btn outline icon="arrow_downward" color="secondary" @click="startQuiz" round>
+          <q-tooltip content-class="desktop-only">
+            开始问卷
+          </q-tooltip>
+        </q-btn>
+      </div>
+      <transition name="fade">
+        <q-form
+          v-if="showQuestions"
+          ref="surveyForm"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          class="column"
+          @validation-error="validError"
+        >
+          <!--          <q-separator v-if="!loading" class="q-ma-md"/>-->
 
-      </q-form>
+          <div v-for="(question,i) in (demoMode ? sdata.questionSet: surveyData.questionSet)" :key="i"
+               class="ques-section">
+            <q-separator v-if="!loading" class="q-mb-sm" size="2px" style="background: rgba(0, 0, 0, 0.05);"/>
+
+            <div v-if="question.type===0">
+              <div class="text-h6 ques-title-large">
+                <b>{{ question.index|formatIndex }} / </b>
+                <span v-if="question.title!==''">{{ question.title }}</span>
+                <span v-else class="text-italic text-grey">(未设置题目)</span>
+                <span v-if="question.need" class="text-red"> *</span>
+              </div>
+              <q-input
+                v-if="demoMode"
+                :disable="submitted===1"
+                placeholder="请输入"
+                :dense="true"
+                filled
+                v-model="answer[i]"
+                :rules="[val => !question.need||(val!=null&&val!='') ||'必填项']"
+              />
+              <q-input
+                v-else
+                :disable="submitted===1"
+                placeholder="请输入"
+                :dense="true"
+                filled
+                v-model="answer.questionSet[i].answer"
+                :rules="[val => !question.need||(val!=null&&val!='') ||'必填项']"
+                @keydown.enter.prevent
+              />
+            </div>
+            <div v-else-if="question.type===1">
+              <div class="text-h6 ques-title">
+                <b>{{ question.index |formatIndex }} / </b>
+                <span v-if="question.title!==''">{{ question.title }}</span>
+                <span v-else class="text-italic text-grey">(未设置题目)</span>
+                <span v-if="question.need" class="text-red"> *</span>
+              </div>
+              <q-field
+                v-if="demoMode"
+                v-model="answer[i]"
+                :rules="[val => !question.need||val!=null||'必填项']"
+                borderless
+                :disable="submitted===1"
+              >
+                <template v-slot:control>
+                  <q-option-group
+                    v-model="answer[i]"
+                    :options="question.options"
+                    color="primary"
+                    type="radio"
+                  />
+                </template>
+              </q-field>
+              <q-field
+                v-else
+                v-model="answer.questionSet[i].answer"
+                :rules="[val => !question.need||val!=null||'必填项']"
+                borderless
+                :disable="submitted===1"
+              >
+                <template v-slot:control>
+                  <q-option-group
+                    v-model="answer.questionSet[i].answer"
+                    :options="question.options"
+                    color="primary"
+                    type="radio"
+                  />
+                </template>
+              </q-field>
+            </div>
+          </div>
+          <q-btn
+            :label="submitted===1?'提交成功': '提交'"
+            :color="submitted===1?'secondary': 'primary'"
+            class="flex-center submit-btn"
+            :disable="submitted!==0"
+            :loading="submitted===-1"
+            @click="submit"
+          />
+
+        </q-form>
+      </transition>
     </div>
     <div v-else-if="surveyData.statusCode===104" class="flex flex-center text-secondary text-h5 q-mt-lg">
       您已提交此问卷
@@ -111,10 +126,11 @@
     </div>
     <br>
     <q-separator v-if="!loading" class="q-ma-md"/>
-    <div v-if="!loading" class="paper-footer text-center">
+    <div v-if="!loading" class="paper-footer text-center" :class="{'fixed-bottom':!showQuestions}"
+         style="height: 100px">
       Copyright © 2021 LoremIpsum Team
       <br/>
-      问卷系统由<span class="no-wrap">LoremSurvey</span>提供
+      问卷系统由<a href="/" class="no-wrap q-link">LoremSurvey</a>提供
       <br/>
       <a href="#" class="q-link">意见反馈</a>
     </div>
@@ -146,8 +162,25 @@ export default {
       res: null,
       sessionId: null,
       demoMode: false,
-      loading: true
+      loading: true,
+      showQuestions: false
     }
+  },
+  mounted() {
+    // let that = this
+    // window.onbeforeunload = function (e) {
+    //   if (that.submitted !== 1) {
+    //     e = e || window.event;
+    //     // 兼容IE8和Firefox 4之前的版本
+    //     if (e) {
+    //       e.returnValue = '关闭提示';
+    //     }
+    //     // Chrome, Safari, Firefox 4+, Opera 12+ , IE 9+
+    //     return '关闭提示';
+    //   } else {
+    //     window.onbeforeunload = null
+    //   }
+    // };
   },
   async created() {
     if (!this.$route.params.token) {
@@ -189,6 +222,9 @@ export default {
     }
   },
   methods: {
+    startQuiz() {
+      this.showQuestions = true
+    },
     submit() {
       this.$refs.surveyForm.validate().then(success => {
         if (success) {
@@ -236,22 +272,29 @@ export default {
 .paper-time {
   margin: 5px;
   color: #aaa;
+  font-family: cursive;
+  font-size: 12px;
 }
 
 .main-con {
   width: min(100vw, 800px);
   width: min(100%, 800px);
   padding: 30px;
+  box-sizing: border-box;
   background-color: #ffffff;
   overflow-x: hidden;
+  /*border-radius: 10px;*/
+  box-shadow: 0 1px 5px #d9e2fb, 0 2px 2px #d9e2fb, 0 3px 1px -2px #d9e2fb;
+  border-top: #1976D2 5px solid;
 }
 
 .ques-title {
   margin-bottom: 8px;
 }
 
-.ques-title b, .ques-title-large b {
-  color: #2c3e50;
+.ques-title, .ques-title-large {
+  color: #3F4049;
+  font-weight: bold;
 }
 
 .ques-title-large {
@@ -259,7 +302,7 @@ export default {
 }
 
 .ques-section {
-  margin: 15px 0;
+  margin-top: 5px;
 }
 
 .submit-btn {
@@ -268,5 +311,24 @@ export default {
 .paper-footer {
   height: 80px;
   padding: 20px;
+}
+
+.fade-enter-active, .fade-leave-active {
+  animation: hei 1s ease;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+@keyframes hei {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
 }
 </style>

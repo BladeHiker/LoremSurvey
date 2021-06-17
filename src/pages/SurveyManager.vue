@@ -29,7 +29,7 @@
       <div class="flex row surveys">
         <q-card v-for="(item,i) in surveyList" v-bind:key="i" class="survey-item">
           <q-card-section class="survey-top text-white"
-                          :class="'bg-'+ colorList[(item.id.charCodeAt(item.id.length-1)*item.id.charCodeAt(item.id.length-2))*37%6]"
+                          :style="'background-image: repeating-linear-gradient(305deg, '+getColor(item.id)+', #ffffff 800px)'"
                           @click="routeTo('manage/edit/'+item.id)">
             <div class="text-h6">
               <div>{{ item.title }}</div>
@@ -127,13 +127,16 @@ export default {
       surveyList: [],
       addDialog: false,
       surveyOpen: true,
-      colorList: ['primary', 'secondary', 'accent', 'positive', 'info', 'warning']
+      colorList: ['#1976D2', '#26A69A', '#9C27B0', '#21BA45', '#31CCEC', '#F2C037']
     }
   },
   created() {
     this.getData()
   },
   methods: {
+    getColor(id) {
+      return this.colorList[(id.charCodeAt(id.length - 1) * id.charCodeAt(id.length - 2)) * 37 % 6]
+    },
     getData() {
       getSurveyList().then(res => {
         this.surveyList = res.data.data

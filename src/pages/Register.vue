@@ -155,8 +155,9 @@ export default {
     onRegister() {
       this.loading = true
       this.isPwd = true
-      this.passwordAgain = this.registerForm.password = this.$md5(this.registerForm.password)
-      register(this.registerForm).then((res) => {
+      let form = JSON.parse(JSON.stringify(this.registerForm))
+      from.password = this.$md5(this.registerForm.password)
+      register(form).then((res) => {
         if (res.data.code === 0) {
           this.loading = false
           //注册成功

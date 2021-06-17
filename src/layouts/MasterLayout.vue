@@ -18,7 +18,7 @@
         </q-toolbar-title>
         <q-toolbar-title>
           <div class="text-center xs-hide">
-            <q-btn flat size="20px" no-caps padding="8px 5px" @click="goHome">
+            <q-btn flat size="20px" no-caps padding="5px 15px" @click="goHome">
               <span class="flex row flex-center">
                     <img
                       alt="LoremSurvey"
@@ -45,7 +45,7 @@
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup v-if="!isLogin" @click="routeTo('login')">
+            <q-item clickable v-close-popup v-if="!isLogin" @click="routeTo('/login')">
               <q-item-section>
                 <q-item-label>登录</q-item-label>
               </q-item-section>
@@ -57,13 +57,13 @@
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup v-if="!isLogin" @click="routeTo('register')">
+            <q-item clickable v-close-popup v-if="!isLogin" @click="routeTo('/register')">
               <q-item-section>
                 <q-item-label>注册</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup v-if="isLogin" @click="routeTo('manage/user')">
+            <q-item clickable v-close-popup v-if="isLogin" @click="routeTo('/manage/user')">
               <q-item-section>
                 <q-item-label>个人中心</q-item-label>
               </q-item-section>
@@ -153,7 +153,7 @@ export default {
       isLogin: true,
       userName: null,
       drawer: false,
-      ver: "v2.3 开发版本"
+      ver: "v2.4 开发版本"
     }
   },
   updated() {
