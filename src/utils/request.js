@@ -17,7 +17,7 @@ service.interceptors.request.use(
     return config;
   },
   error => {
-    Notify.create({message: error.toString(), color: 'negative', position: 'top', timeout: 1500, icon: 'warning'})
+    Notify.create({message: error.toString(), color: 'negative', position: 'top', timeout: 2000, icon: 'warning'})
     return error;
   }
 );
@@ -31,7 +31,7 @@ service.interceptors.response.use(
         return response
       case 1:
         //token错误
-        Notify.create({message: response.data.message.toString(), color: 'warning', position: 'top', timeout: 1500})
+        Notify.create({message: response.data.message.toString(), color: 'warning', position: 'top', timeout: 2000})
         setTimeout(() => {
           document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
           document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -40,21 +40,21 @@ service.interceptors.response.use(
         return response
       case 2:
         //用户操作错误
-        Notify.create({message: response.data.message.toString(), color: 'info', position: 'top', timeout: 1500})
+        Notify.create({message: response.data.message.toString(), color: 'orange', position: 'top', timeout: 2000})
         return response
       case -1:
         //系统错误
-        Notify.create({message: '系统错误', color: 'warning', position: 'top', timeout: 1500})
+        Notify.create({message: '系统错误', color: 'deep-orange-14', position: 'top', timeout: 2000})
         return response
       case 7:
-        Notify.create({message: response.data.message.toString(), color: 'warning', position: 'top', timeout: 1500})
+        Notify.create({message: response.data.message.toString(), color: 'warning', position: 'top', timeout: 2000})
         return response
       default:
         return response
     }
   },
   error => {
-    Notify.create({message: error.toString(), color: 'negative', position: 'top', timeout: 1500, icon: 'warning'})
+    Notify.create({message: error.toString(), color: 'negative', position: 'top', timeout: 2000, icon: 'warning'})
     return error
   }
 )

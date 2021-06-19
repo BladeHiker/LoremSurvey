@@ -9,10 +9,10 @@
     </div>
     <div class="flex column items-stretch" v-else-if="demoMode || surveyData.statusCode===103">
       <div class="paper-header">
-        <div class="text-h4 text-center paper-title">{{ demoMode ? sdata.title : surveyData.title }}</div>
+        <div class="text-h4 text-center paper-title">{{ surveyData.title }}</div>
         <div class="text-center paper-time" v-if="$route.params.token">ID:{{ $route.params.token.toUpperCase() }}</div>
         <br>
-        <div v-html="demoMode?sdata.desc : surveyData.desc"></div>
+        <div v-html="surveyData.desc"></div>
       </div>
       <div class="text-center q-pa-lg" v-if="!showQuestions">
         <q-space/>
@@ -34,7 +34,7 @@
         >
           <!--          <q-separator v-if="!loading" class="q-ma-md"/>-->
 
-          <div v-for="(question,i) in (demoMode ? sdata.questionSet: surveyData.questionSet)" :key="i"
+          <div v-for="(question,i) in  surveyData.questionSet" :key="i"
                class="ques-section">
             <q-separator v-if="!loading" class="q-mb-sm" size="2px" style="background: rgba(0, 0, 0, 0.05);"/>
 
@@ -46,16 +46,6 @@
                 <span v-if="question.need" class="text-red"> *</span>
               </div>
               <q-input
-                v-if="demoMode"
-                :disable="submitted===1"
-                placeholder="请输入"
-                :dense="true"
-                filled
-                v-model="answer[i]"
-                :rules="[val => !question.need||(val!=null&&val!='') ||'必填项']"
-              />
-              <q-input
-                v-else
                 :disable="submitted===1"
                 placeholder="请输入"
                 :dense="true"
@@ -65,31 +55,16 @@
                 @keydown.enter.prevent
               />
             </div>
-            <div v-else-if="question.type===1">
+            <div v-else-if="question.type===1||question.type===2">
               <div class="text-h6 ques-title">
                 <b>{{ question.index |formatIndex }} / </b>
                 <span v-if="question.title!==''">{{ question.title }}</span>
                 <span v-else class="text-italic text-grey">(未设置题目)</span>
                 <span v-if="question.need" class="text-red"> *</span>
+                <q-chip v-if="question.type===2" dense square class="float-right" outline color="teal-4"
+                        label="多选题"/>
               </div>
               <q-field
-                v-if="demoMode"
-                v-model="answer[i]"
-                :rules="[val => !question.need||val!=null||'必填项']"
-                borderless
-                :disable="submitted===1"
-              >
-                <template v-slot:control>
-                  <q-option-group
-                    v-model="answer[i]"
-                    :options="question.options"
-                    color="primary"
-                    type="radio"
-                  />
-                </template>
-              </q-field>
-              <q-field
-                v-else
                 v-model="answer.questionSet[i].answer"
                 :rules="[val => !question.need||val!=null||'必填项']"
                 borderless
@@ -100,7 +75,7 @@
                     v-model="answer.questionSet[i].answer"
                     :options="question.options"
                     color="primary"
-                    type="radio"
+                    :type="question.type===1? 'radio':'checkbox'"
                   />
                 </template>
               </q-field>
@@ -210,21 +185,50 @@ export default {
         } else if (this.surveyData.questionSet[i].type === 0) {
           //填空题
           this.answer.questionSet.push({index: i + 1, answer: null, id: this.surveyData.questionSet[i].id})
+        } else if (this.surveyData.questionSet[i].type === 2) {
+          //多选
+          this.answer.questionSet.push({index: i + 1, answer: [], id: this.surveyData.questionSet[i].id})
         }
       }
     }
     this.loading = false
+  },
+  mounted() {
+    if (this.demoMode) {
+      this.$nextTick(() => {
+          this.surveyData = this.$props.sdata
+          this.surveyData.questionSet.sort((a, b) => {
+            return a.index > b.index ? 1 : -1
+          })
+
+          for (let i = 0; i < this.surveyData.questionSet.length; ++i) {
+            if (this.surveyData.questionSet[i].type === 1) {
+              //选择题
+              this.answer.questionSet.push({index: i + 1, answer: null, id: this.surveyData.questionSet[i].id})
+            } else if (this.surveyData.questionSet[i].type === 0) {
+              //填空题
+              this.answer.questionSet.push({index: i + 1, answer: null, id: this.surveyData.questionSet[i].id})
+            } else if (this.surveyData.questionSet[i].type === 2) {
+              //多选
+              this.answer.questionSet.push({index: i + 1, answer: [], id: this.surveyData.questionSet[i].id})
+            }
+          }
+        }
+      )
+    }
   },
   filters: {
     formatIndex: function (index) {
       if (index < 10) return '0' + index
       return index
     }
-  },
+  }
+  ,
   methods: {
     startQuiz() {
       this.showQuestions = true
-    },
+    }
+    ,
     submit() {
       this.$refs.surveyForm.validate().then(success => {
         if (success) {
@@ -248,7 +252,8 @@ export default {
       })
 
 
-    },
+    }
+    ,
     validError() {
       Notify.create({message: "存在未填项", color: 'negative', position: 'top', timeout: 1500, icon: 'warning'})
     }

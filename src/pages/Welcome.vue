@@ -31,6 +31,18 @@
         </q-timeline-entry>
 
         <q-timeline-entry
+          title="V2.5"
+          subtitle="2021年6月19日"
+        >
+          <div>
+            更新迭代
+            <ul>
+              <li>新增：多选题</li>
+              <li>界面：更新题目修改界面、答题界面</li>
+            </ul>
+          </div>
+        </q-timeline-entry>
+        <q-timeline-entry
           title="V2.4"
           subtitle="2021年6月17日"
         >

@@ -104,7 +104,7 @@ export default {
         phone: "*",
         username: "*"
       },
-      changePassword: true,
+      changePassword: false,
       pswdForm: {
         old: "",
         new: ""

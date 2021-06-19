@@ -156,7 +156,7 @@ export default {
       this.loading = true
       this.isPwd = true
       let form = JSON.parse(JSON.stringify(this.registerForm))
-      from.password = this.$md5(this.registerForm.password)
+      form.password = this.$md5(this.registerForm.password)
       register(form).then((res) => {
         if (res.data.code === 0) {
           this.loading = false

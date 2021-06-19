@@ -153,7 +153,7 @@ export default {
       isLogin: true,
       userName: null,
       drawer: false,
-      ver: "v2.4 开发版本"
+      ver: "v2.5 开发版本"
     }
   },
   updated() {

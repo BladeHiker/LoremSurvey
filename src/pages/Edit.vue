@@ -75,7 +75,7 @@
                   <div v-for="(question,pid) in surveyData.questionSet" :key="pid+1" class="ques-section">
                     <div v-if="question.type===0">
                       <div v-if="editing!==pid" @click="editing=pid;isEditing=true" class="editable">
-                        <div class="float-right q-pa-sm" v-if="!validQuestion(pid)">
+                        <div class="float-right" style="padding: 1px" v-if="!validQuestion(pid)">
                           <q-icon name="error" color="red" size="25px"></q-icon>
                         </div>
                         <div class="text-h6 ques-title-large">
@@ -90,33 +90,47 @@
                                  v-model="answer[pid]"
                         />
                       </div>
-                      <div v-if="editing===pid">
+                      <div v-else class="edit-area shadow-3">
+                        <div class="text-grey-8 q-pb-md  flex justify-center text-center text-body1">
+                          <q-btn round dense icon="arrow_upward" class="q-ma-sm text-primary" @click="upQuestion(pid)">
+                            <q-tooltip>上移</q-tooltip>
+                          </q-btn>
+                          <q-btn round dense icon="arrow_downward" class="q-ma-sm text-primary"
+                                 @click="downQuestion(pid)">
+                            <q-tooltip>下移</q-tooltip>
+                          </q-btn>
+                          <q-btn round dense icon="close" class="q-ma-sm text-orange" @click="delQuestion(pid)">
+                            <q-tooltip>删除</q-tooltip>
+                          </q-btn>
+                          <q-btn round dense icon="check" class="q-ma-sm text-secondary" @click="editing=-1">
+                            <q-tooltip>完成</q-tooltip>
+                          </q-btn>
+                        </div>
                         <div class="text-h6 ques-title-large">
                           <b>{{ pid + 1|formatIndex }} / </b>
                           <input v-model="question.title" autofocus="autofocus" placeholder="输入问题" minlength="1"
                                  maxlength="128"
                                  class="input-title"/>
                           <span v-if="question.need" class="text-red"> *</span>
-                          <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
-                            <q-toggle label="必填项" dense v-model="question.need"/>
-                            <q-btn flat dense icon="arrow_upward" label="上移" @click="upQuestion(pid)"/>
-                            <q-btn flat dense icon="arrow_downward" label="下移" @click="downQuestion(pid)"/>
-                            <q-btn flat dense icon="close" label="删除" @click="delQuestion(pid)"/>
-                            <q-btn flat dense icon="check" label="完成" @click="editing=-1"/>
+                          <div class="text-grey-8 q-gutter-xs q-mt-sm text-right text-body1 question-btn">
+                            <q-checkbox label="必填项" dense class="q-mx-sm" v-model="question.need"/>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div v-else-if="question.type===1">
+                    <div v-else-if="question.type===1||question.type===2">
                       <div class="editable" @click="editing=pid;isEditing=true;onAddOption=pid" v-if="editing!==pid">
-                        <div class="float-right q-pa-sm" v-if="!validQuestion(pid)">
+                        <div class="float-right" style="padding: 1px" v-if="!validQuestion(pid)">
                           <q-icon name="error" color="red" size="25px"></q-icon>
                         </div>
+                        <q-chip v-if="question.type===2" dense square class="float-right" outline color="teal-4"
+                                label="多选题"/>
                         <div class="text-h6 ques-title">
                           <b>{{ pid + 1 |formatIndex }} / </b>
                           <span v-if="question.title!==''">{{ question.title }}</span>
                           <span v-else class="text-green-5"><i>点击编辑问题</i></span>
                           <span v-if="question.need" class="text-red"> *</span>
+
                         </div>
                         <q-field
                           borderless
@@ -126,14 +140,29 @@
                             <q-option-group
                               :options="question.options"
                               color="primary"
-                              type="radio"
+                              :type="question.type===1? 'radio':'checkbox'"
                               v-model="answer[pid]"
-                              @input="answer[pid]=null"
+                              @input="answer[pid]=(question.type===1?null:[])"
                             />
                           </template>
                         </q-field>
                       </div>
-                      <div v-else>
+                      <div v-else class="edit-area shadow-3">
+                        <div class="text-grey-8 q-pb-md flex justify-center text-center text-body1">
+                          <q-btn round dense icon="arrow_upward" class="q-ma-sm text-primary" @click="upQuestion(pid)">
+                            <q-tooltip>上移</q-tooltip>
+                          </q-btn>
+                          <q-btn round dense icon="arrow_downward" class="q-ma-sm text-primary"
+                                 @click="downQuestion(pid)">
+                            <q-tooltip>下移</q-tooltip>
+                          </q-btn>
+                          <q-btn round dense icon="close" class="q-ma-sm text-deep-orange" @click="delQuestion(pid)">
+                            <q-tooltip>删除</q-tooltip>
+                          </q-btn>
+                          <q-btn round dense icon="check" class="q-ma-sm text-secondary" @click="editing=-1">
+                            <q-tooltip>完成</q-tooltip>
+                          </q-btn>
+                        </div>
                         <div class="text-h6 ques-title">
                           <b>{{ pid + 1 |formatIndex }} / </b>
                           <input v-model="question.title" autofocus="autofocus" placeholder="输入问题" minlength="1"
@@ -141,12 +170,10 @@
                                  class="input-title"
                                  :style="{'border-color': question.title===''? '#C10015':'#1976D2'}">
                           <span v-if="question.need" class="text-red"> *</span>
-                          <div class="text-grey-8 q-gutter-xs text-right text-body1 question-btn">
-                            <q-toggle label="必填项" dense v-model="question.need"/>
-                            <q-btn flat dense icon="arrow_upward" label="上移" @click="upQuestion(pid)"/>
-                            <q-btn flat dense icon="arrow_downward" label="下移" @click="downQuestion(pid)"/>
-                            <q-btn flat dense icon="close" label="删除" @click="delQuestion(pid)"/>
-                            <q-btn flat dense icon="check" label="完成" @click="editing=-1"/>
+                          <div class="text-grey-8 q-gutter-xs q-mt-sm text-right text-body1 question-btn">
+                            <q-checkbox label="必填项" dense class="q-mx-sm" v-model="question.need"/>
+                            <q-checkbox label="多选题" dense class="q-mx-sm" :value="question.type===2"
+                                        @input="setMulti(pid)"/>
                           </div>
                         </div>
                         <q-list bordered>
@@ -354,13 +381,18 @@
                       </q-list>
                     </div>
                   </div>
-                  <div v-else-if="question.type===1">
+                  <div v-else-if="question.type===1||question.type===2">
                     <div>
+                      <q-chip v-if="question.type===2" dense square class="float-right" style="margin: 6px" outline color="teal-4"
+                              label="多选题"/>
+                      <q-chip v-if="question.type===1" dense square class="float-right" style="margin: 6px" outline color="light-blue-6"
+                              label="单选题"/>
                       <div class="text-h6 ques-title">
                         <b>{{ pid + 1 |formatIndex }} / </b>
                         <span v-if="question.title!==''">{{ question.title }}</span>
                         <span v-else class="text-green-5"><i>无标题</i></span>
                         <span v-if="question.need" class="text-red"> *</span>
+
                       </div>
                       <q-list bordered separator>
                         <q-item v-for="(option,i) in question.options" :key="i">
@@ -582,6 +614,15 @@ export default {
     }
   },
   methods: {
+    setMulti(pid) {
+      if (this.surveyData.questionSet[pid].type === 2) {
+        this.surveyData.questionSet[pid].type = 1
+        this.answer[pid] = null
+      } else {
+        this.surveyData.questionSet[pid].type = 2
+        this.answer[pid] = []
+      }
+    },
     switchShow(pid) {
       Vue.set(this.showAllAns, pid, !this.showAllAns[pid])
     },
@@ -724,6 +765,7 @@ export default {
       this.surveyData = res.data.data
       this.sortQuestions()
       for (let i = 0; i < this.surveyData.questionSet.length; i++) {
+        this.answer.push(this.surveyData.questionSet[i].type === 2 ? [] : null)
         if (this.surveyData.questionSet[i].type === 1) {
           this.surveyData.questionSet[i].options.sort((a, b) => {
             return a.value < b.value ? 1 : -1
@@ -907,5 +949,25 @@ export default {
   width: min(90vw, 800px);
   max-width: 100%;
   background-color: #fffffff0;
+}
+
+.edit-area {
+  margin: 20px -20px;
+  padding: 20px;
+  border-radius: 4px;
+  animation: bounce-in 0.2s ease-in-out;
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    padding: 10px;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    padding: 20px;
+    transform: scale(1);
+  }
 }
 </style>
