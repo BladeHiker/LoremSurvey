@@ -1,5 +1,6 @@
 import axios from 'axios'; // 引入axios
 import {Notify} from "quasar";
+import VueCookies from "vue-cookies";
 
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
@@ -10,9 +11,15 @@ const service = axios.create({
 //http request 拦截器
 service.interceptors.request.use(
   config => {
+    let token = null
+
+    if (VueCookies.isKey('csrftoken')) {
+      token = VueCookies.get('csrftoken');
+    }
     config.data = JSON.stringify(config.data);
     config.headers = {
       'Content-Type': 'application/json',
+      'X-CSRFToken': token
     }
     return config;
   },
