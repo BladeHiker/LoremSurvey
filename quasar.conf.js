@@ -21,7 +21,7 @@ module.exports = function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v1.quasar.dev/quasar-cli/boot-files
     boot: [
-
+      'utils',
       'axios',
     ],
 
@@ -66,6 +66,16 @@ module.exports = function (/* ctx */) {
 
       // https://v1.quasar.dev/quasar-cli/handling-webpack
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
+      extendWebpack(cfg, {isServer, isClient}) {
+        cfg.module.rules.push({
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loader: 'babel-loader',
+          options: {
+            plugins: ['@babel/plugin-syntax-dynamic-import']
+          }
+        })
+      },
       chainWebpack(chain) {
         chain.plugin('eslint-webpack-plugin')
           .use(ESLintPlugin, [{extensions: ['js', 'vue']}])

@@ -24,13 +24,13 @@
     <!--            </div>-->
     <!--          </div>-->
     <!--          <div class="column">-->
-    <!--            <div v-for="(problem,i) in surveyData.problemSet" :key="i" class="ques-section">-->
-    <!--              <div v-if="problem.type===0">-->
+    <!--            <div v-for="(question,i) in surveyData.questionSet" :key="i" class="ques-section">-->
+    <!--              <div v-if="question.type===0">-->
     <!--                <div>-->
     <!--                  <div class="text-h6 ques-title-large">-->
     <!--                    <b>{{ i + 1|formatIndex }} / </b>-->
-    <!--                    <span>{{ problem.title }}</span>-->
-    <!--                    <span v-if="problem.need" class="text-red"> *</span>-->
+    <!--                    <span>{{ question.title }}</span>-->
+    <!--                    <span v-if="question.need" class="text-red"> *</span>-->
     <!--                  </div>-->
     <!--                  <q-input placeholder="请输入"-->
     <!--                           disable-->
@@ -40,11 +40,11 @@
     <!--                  />-->
     <!--                </div>-->
     <!--              </div>-->
-    <!--              <div v-else-if="problem.type===1">-->
+    <!--              <div v-else-if="question.type===1">-->
     <!--                <div class="text-h6 ques-title">-->
     <!--                  <b>{{ i + 1 |formatIndex }} / </b>-->
-    <!--                  <span>{{ problem.title }}</span>-->
-    <!--                  <span v-if="problem.need" class="text-red"> *</span>-->
+    <!--                  <span>{{ question.title }}</span>-->
+    <!--                  <span v-if="question.need" class="text-red"> *</span>-->
     <!--                </div>-->
     <!--                <q-field-->
     <!--                  v-model="answer[i]"-->
@@ -54,7 +54,7 @@
     <!--                  <template v-slot:control>-->
     <!--                    <q-option-group-->
     <!--                      v-model="answer[i]"-->
-    <!--                      :options="problem.options"-->
+    <!--                      :options="question.options"-->
     <!--                      color="primary"-->
     <!--                      type="radio"-->
     <!--                    />-->

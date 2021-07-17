@@ -1,15 +1,15 @@
 <template>
   <q-page class="flex justify-center">
     <div class="work-area">
-      <div class="manager-header">
-        <div class="text-h3">
-          受访者管理
-        </div>
-        <q-separator color="black"></q-separator>
-      </div>
+<!--      <div class="manager-header">-->
+<!--        <div class="text-h3">-->
+<!--          受访者管理-->
+<!--        </div>-->
+<!--        <q-separator color="black"></q-separator>-->
+<!--      </div>-->
       <div class="q-pa-md">
         <q-table
-          title="受访者"
+          title="受访者列表"
           :data="data"
           :columns="columns"
           row-key="name"
@@ -95,7 +95,9 @@ export default {
       for (let i = 0; i < this.selected.length; i++) {
         delList.push(this.selected[i].id)
       }
-      deleteRespondents(delList)
+      deleteRespondents(delList).then(() => {
+        this.getData()
+      })
     }
   }
 }

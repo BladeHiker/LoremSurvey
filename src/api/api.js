@@ -40,3 +40,44 @@ export const logout = (data) => {
     data
   })
 }
+
+export const getCaptcha = (data) => {
+  return service({
+    url: "/api/user/getcaptcha",
+    method: 'get',
+    data
+  })
+}
+
+export const getUserInfo = (data) => {
+  return service({
+    url: "/api/user/userinfo",
+    method: 'get',
+    data
+  })
+}
+
+export const changeUserPassword = (data) => {
+  return service({
+    url: "/api/user/userinfo",
+    method: 'put',
+    data
+  })
+}
+
+export const sendEmailCode = (data) => {
+  return service({
+    url: "/api/user/changepw",
+    method: 'post',
+    data
+  })
+}
+
+export const changePasswordByEmail = (data) => {
+  return service({
+    url: "/api/user/changepw",
+    method: 'put',
+    data
+  })
+}
+

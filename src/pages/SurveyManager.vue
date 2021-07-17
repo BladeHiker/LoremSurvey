@@ -1,32 +1,44 @@
 <template>
-  <q-page class="flex justify-center">
+  <q-page class="flex column content-center">
+    <div class="main-btn-group">
+      <q-btn flat color="primary" icon-right="arrow_forward"
+             @click="routeTo('/manage/respondents')">
+        受访者管理
+      </q-btn>
+      <q-btn flat color="primary" icon-right="arrow_forward" @click="onCreateSurvey">
+        创建问卷
+      </q-btn>
+    </div>
     <div class="work-area">
-      <div class="manager-header">
-        <div class="text-h3">
-          问卷管理
-        </div>
-        <q-separator color="black"></q-separator>
-        <div class="main-btn-group">
-          <q-btn flat color="primary" icon-right="arrow_forward"
-                 @click="routeTo('/manage/respondents')">
-            受访者管理
-          </q-btn>
-          <q-btn flat color="primary" icon-right="arrow_forward" @click="onCreateSurvey">
-            创建问卷
-          </q-btn>
-        </div>
-      </div>
+      <!--      <div class="manager-header">-->
+      <!--        <div class="text-h3">-->
+      <!--          问卷管理-->
+      <!--        </div>-->
+      <!--        <q-separator color="black"></q-separator>-->
+      <!--        <div class="main-btn-group">-->
+      <!--          <q-btn flat color="primary" icon-right="arrow_forward"-->
+      <!--                 @click="routeTo('/manage/respondents')">-->
+      <!--            受访者管理-->
+      <!--          </q-btn>-->
+      <!--          <q-btn flat color="primary" icon-right="arrow_forward" @click="onCreateSurvey">-->
+      <!--            创建问卷-->
+      <!--          </q-btn>-->
+      <!--        </div>-->
+      <!--      </div>-->
+
       <div class="flex row surveys">
         <q-card v-for="(item,i) in surveyList" v-bind:key="i" class="survey-item">
-          <q-card-section class="survey-top text-white" :class="'bg-'+ colorList[i*7%6]">
+          <q-card-section class="survey-top text-white"
+                          :style="'background-image: repeating-linear-gradient(305deg, '+getColor(item.id)+', #ffffff 800px)'"
+                          @click="routeTo('manage/edit/'+item.id)">
             <div class="text-h6">
               <div>{{ item.title }}</div>
               <div class="text-subtitle2">
-                {{ item.isopen ? '开放问卷' : "定向问卷" }}
+                {{ item.open ? '开放问卷' : "定向问卷" }}
               </div>
             </div>
 
-            <div class="text-subtitle2" v-if="item.isrunning">
+            <div class="text-subtitle2" v-if="item.running">
               <q-icon name="fiber_manual_record" color="light-green"></q-icon>
               收集中
             </div>
@@ -34,6 +46,7 @@
               <q-icon name="fiber_manual_record" color="red"></q-icon>
               停止收集
             </div>
+            <q-icon name="description" style="opacity: 0.5" size="100px" class="absolute-bottom-right"/>
           </q-card-section>
           <q-separator dark/>
           <q-card-actions>
@@ -49,6 +62,57 @@
         <div class="survey-void"></div>
         <div class="survey-void"></div>
       </div>
+      <q-dialog v-model="addDialog">
+        <q-card>
+          <q-card-section>
+            <div class="text-h6">选择问卷类型</div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-none">
+            <q-btn-toggle
+              v-model="surveyOpen"
+              toggle-color="primary"
+              :options="[{value: true, slot: 'one'},{value: false, slot: 'two'},]"
+            >
+              <template v-slot:one>
+                <div class="row items-center no-wrap q-py-md">
+                  <div class="text-center">
+                    <b class="text-h5">开放问卷</b>
+                    <hr/>
+                    <div>
+                      受访者通过问卷链接匿名做答
+                      <br/>
+                      <br/>
+                      问卷链接多次有效
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+              <template v-slot:two>
+                <div class="row items-center no-wrap q-py-md">
+                  <div class="text-center">
+                    <b class="text-h5">定向问卷</b>
+                    <hr/>
+                    <div>
+                      受访者通过私密链接实名作答
+                      <br/>
+                      <br/>
+                      问卷链接单次有效
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </q-btn-toggle>
+            <div class="q-mt-md"> * 问卷类型可以在创建后切换</div>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn flat label="取消" color="primary" v-close-popup/>
+            <q-btn flat label="创建" color="primary" @click="createSurvey" v-close-popup/>
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
   </q-page>
 </template>
@@ -61,13 +125,18 @@ export default {
   data() {
     return {
       surveyList: [],
-      colorList: ['primary', 'secondary', 'accent', 'positive', 'info', 'warning']
+      addDialog: false,
+      surveyOpen: true,
+      colorList: ['#1976D2', '#26A69A', '#9C27B0', '#21BA45', '#31CCEC', '#F2C037']
     }
   },
   created() {
     this.getData()
   },
   methods: {
+    getColor(id) {
+      return this.colorList[(id.charCodeAt(id.length - 1) * id.charCodeAt(id.length - 2)) * 37 % 6]
+    },
     getData() {
       getSurveyList().then(res => {
         this.surveyList = res.data.data
@@ -77,14 +146,18 @@ export default {
       this.$router.push(url)
     },
     onCreateSurvey() {
+      this.surveyOpen = true
+      this.addDialog = true
+    },
+    createSurvey() {
       createSurveyItem({
-        isopen: false,
-        isrunning: false,
+        open: this.surveyOpen,
+        running: false,
         title: "无标题问卷",
-        stime: null,
-        etime: null,
+        startTime: null,
+        stopTime: null,
         desc: "",
-        problemSet: [],
+        questionSet: [],
         emailTemplate: ""
       }).then(res => {
         this.routeTo('manage/edit/' + res.data.data.id)
@@ -97,8 +170,9 @@ export default {
         cancel: true,
         persistent: true
       }).onOk(() => {
-        deleteSurveyItem({id: i})
-        this.getData()
+        deleteSurveyItem({id: i}).then(() => {
+          this.getData()
+        })
       })
     }
   }
@@ -107,9 +181,18 @@ export default {
 
 <style scoped>
 .survey-item {
-  width: 270px;
+  width: 300px;
   height: 215px;
   margin-bottom: 20px;
+  margin-right: 10px;
+}
+
+.survey-item:hover {
+  transform: scale(1.01);
+}
+
+.survey-item:active {
+  transform: scale(0.99);
 }
 
 .surveys {
@@ -126,6 +209,7 @@ export default {
 }
 
 .survey-top {
+  cursor: pointer;
   height: 160px;
   text-shadow: 3px 2px 11px #2d2d2da3;
 }
@@ -137,6 +221,19 @@ export default {
 
 
 .survey-void {
-  width: 270px;
+  width: 300px;
+  margin-right: 10px;
+}
+
+@media (max-width: 690px) {
+  .survey-item {
+    width: 80vw;
+    margin-right: 0;
+  }
+
+  .survey-void {
+    width: 80vw;
+    margin-right: 0;
+  }
 }
 </style>

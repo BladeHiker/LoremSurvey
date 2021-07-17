@@ -10,8 +10,9 @@
         <br/>
         <q-input
           label="用户名"
+          name="username"
           v-model="registerForm.username"
-          maxlength="20"
+          maxlength="50"
           lazy-rules
           :rules="[
             val => val && val.length > 0 || '请输入用户名',
@@ -39,7 +40,7 @@
         <q-input
           label="邮箱"
           v-model="registerForm.email"
-          maxlength="20"
+          maxlength="50"
           lazy-rules
           :rules="[
             val => val && val.length > 0 || '请输入邮箱',
@@ -52,6 +53,7 @@
         </q-input>
         <q-input
           label="密码"
+          name="password"
           v-model="registerForm.password"
           maxlength="20"
           autocomplete="new-password"
@@ -86,6 +88,22 @@
             <q-icon name="lock"></q-icon>
           </template>
         </q-input>
+        <q-input
+          label="验证码"
+          v-model="registerForm.captcha.code"
+          maxlength="20"
+          lazy-rules
+          :rules="[ val => val && val.length > 0 || '请输入验证码']"
+        >
+          <template v-slot:prepend>
+            <q-icon name="how_to_reg"></q-icon>
+          </template>
+          <template v-slot:after>
+            <q-img style="cursor: pointer" @click="getCaptchaData" :src="'data:image/png;base64,'+captchaImg"
+                   width="100px" height="50px">
+            </q-img>
+          </template>
+        </q-input>
         <q-btn color="primary" type="submit" label="注册" :loading="loading"/>
         <div class="text-center">
           <q-btn flat dense @click="toLogin">登录</q-btn>
@@ -97,7 +115,7 @@
 
 <script>
 
-import {register} from "src/api/api";
+import {getCaptcha, register} from "src/api/api";
 
 
 export default {
@@ -109,24 +127,37 @@ export default {
         username: null,
         password: "",
         phone: "",
-        email: ""
+        email: "",
+        captcha: {
+          code: "",
+          id: "",
+        }
       },
       passwordAgain: "",
       loading: false,
+      captchaImg: null
     };
   },
   created() {
-
+    this.getCaptchaData()
   },
   methods: {
+    getCaptchaData() {
+      getCaptcha().then(res => {
+        this.registerForm.captcha.code = ""
+        this.registerForm.captcha.id = res.data.data.id
+        this.captchaImg = res.data.data.base64Data
+      })
+    },
     toLogin() {
       this.$router.push('login')
     },
     onRegister() {
       this.loading = true
       this.isPwd = true
-      this.passwordAgain = this.registerForm.password = this.$md5(this.registerForm.password)
-      register(this.registerForm).then((res) => {
+      let form = JSON.parse(JSON.stringify(this.registerForm))
+      form.password = this.$md5(this.registerForm.password)
+      register(form).then((res) => {
         if (res.data.code === 0) {
           this.loading = false
           //注册成功
@@ -137,7 +168,9 @@ export default {
         console.log(err)
         this.loading = false
       }).finally(() => {
+        this.loading = false
         this.passwordAgain = this.registerForm.password = ""
+        this.getCaptchaData()
       })
     }
   },
@@ -148,7 +181,7 @@ export default {
 .login-card {
   margin: 20px 0;
   padding: 20px;
-  height: 600px;
+  height: 700px;
   width: min(400px, 90vw);
   justify-content: space-around;
 }
