@@ -1,18 +1,49 @@
 <template>
   <div>
-    <!--    <q-toolbar class="bg-blue-grey-1 flex flex-center text-teal">-->
-    <!--      <q-icon name="description"/>-->
-    <!--      &nbsp;-->
-    <!--      <div class="text-weight-bold edit-title" v-if="surveyData.title!==''">-->
-    <!--        {{ surveyData.title }}-->
-    <!--      </div>-->
-    <!--      <div class="text-weight-bold edit-title" v-else>-->
-    <!--        <i>无标题问卷</i>-->
-    <!--      </div>-->
-    <!--      <span v-if="isEditing"> &nbsp;-&nbsp;正在编辑</span>-->
-    <!--      <span v-else> &nbsp;-&nbsp;已保存</span>-->
-    <!--    </q-toolbar>-->
-    <q-footer v-show="!paperSimulate" elevated>
+    <q-drawer
+      side="right"
+      show-if-above
+      bordered
+      content-class="bg-grey-2"
+      :width="150"
+      class="gt-sm drawer-pc"
+    >
+      <q-list class="q-py-lg">
+        <q-item clickable v-ripple @click="routeTo({})" :active="tab==='edit'">
+          <q-item-section avatar>
+            <q-icon name="edit"/>
+          </q-item-section>
+          <q-item-section>
+            编辑
+          </q-item-section>
+        </q-item>
+        <q-item clickable v-ripple @click="routeTo({query:{tab:'2'}})" :active="tab==='send'">
+          <q-item-section avatar>
+            <q-icon name="share"/>
+          </q-item-section>
+          <q-item-section>
+            发布
+          </q-item-section>
+        </q-item>
+        <q-item clickable v-ripple @click="routeTo({query:{tab:'3'}})" :active="tab==='response'">
+          <q-item-section avatar>
+            <q-icon name="equalizer"/>
+          </q-item-section>
+          <q-item-section>
+            结果
+          </q-item-section>
+        </q-item>
+        <q-item clickable v-ripple @click="routeTo({query:{tab:'4'}})" :active="tab==='setting'">
+          <q-item-section avatar>
+            <q-icon name="settings"/>
+          </q-item-section>
+          <q-item-section>
+            设置
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-drawer>
+    <q-footer v-show="!paperSimulate" elevated class="lt-md">
       <q-tabs
         v-model="tab"
         class="shadow-2 bg-primary"
@@ -230,15 +261,23 @@
                 </transition-group>
               </div>
               <q-space style="height: 100px"/>
-              <q-btn-group spread outline class="q-mt-lg shadow-3 edit-toolbox" stretch>
+              <!--移动端功能组-->
+              <q-btn-group spread outline class="q-mt-lg shadow-3 edit-toolbox lt-lg" stretch>
                 <q-btn label="选择题" stack icon="check_box" @click="addChoiceQuestion"/>
                 <q-btn label="填空题" stack icon="question_answer" @click="addBlankQuestion"/>
                 <q-btn label="预览" stack icon="visibility" @click="paperSimulate=true"/>
                 <q-btn label="保存" stack icon="save" @click="onSave"/>
               </q-btn-group>
-
+              <!--桌面端功能组-->
+              <q-btn-group spread outline class="q-mt-lg edit-toolbox-pc gt-md" stretch>
+                <q-btn label="选择题" stack icon="check_box" @click="addChoiceQuestion"/>
+                <q-btn label="填空题" stack icon="question_answer" @click="addBlankQuestion"/>
+                <q-btn label="预览" stack icon="visibility" @click="paperSimulate=true"/>
+                <q-btn label="保存" stack icon="save" @click="onSave"/>
+              </q-btn-group>
             </div>
           </div>
+
         </div>
       </q-tab-panel>
       <q-tab-panel name="send" class="column">
@@ -383,9 +422,11 @@
                   </div>
                   <div v-else-if="question.type===1||question.type===2">
                     <div>
-                      <q-chip v-if="question.type===2" dense square class="float-right" style="margin: 6px" outline color="teal-4"
+                      <q-chip v-if="question.type===2" dense square class="float-right" style="margin: 6px" outline
+                              color="teal-4"
                               label="多选题"/>
-                      <q-chip v-if="question.type===1" dense square class="float-right" style="margin: 6px" outline color="light-blue-6"
+                      <q-chip v-if="question.type===1" dense square class="float-right" style="margin: 6px" outline
+                              color="light-blue-6"
                               label="单选题"/>
                       <div class="text-h6 ques-title">
                         <b>{{ pid + 1 |formatIndex }} / </b>
@@ -847,7 +888,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .question-btn {
   padding-right: 16px;
 }
@@ -945,10 +986,30 @@ export default {
 .edit-toolbox {
   position: fixed;
   bottom: 60px;
-  left: max(5vw, calc(50vw - 400px));
+  left: max(5vw, calc(50vw - 450px));
   width: min(90vw, 800px);
   max-width: 100%;
   background-color: #fffffff0;
+}
+
+.edit-toolbox-pc {
+  position: fixed;
+  top: 120px;
+  left: calc(50vw + 400px);
+  /*bottom: calc(50vh - 350px);*/
+  flex-direction: column;
+  max-width: 100%;
+  background-color: #fffffff0;
+  border: 1px #e3e3e3 solid;
+}
+
+.edit-toolbox-pc > * {
+  padding: 15px 8px;
+}
+
+.q-drawer--right {
+  position: fixed;
+  height: 100vh;
 }
 
 .edit-area {

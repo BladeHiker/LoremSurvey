@@ -30,7 +30,7 @@
           lazy-rules
           :rules="[
             val => val && val.length !== 0 || '请输入手机号',
-            val => val && /^[1][3,4,5,7,8][0-9]{9}$/.test(val) || '请输入正确的手机号',
+            val => val && /^[1][3,4,5,7,8,9][0-9]{9}$/.test(val) || '请输入正确的手机号',
           ]"
         >
           <template v-slot:prepend>

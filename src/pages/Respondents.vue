@@ -1,12 +1,12 @@
 <template>
   <q-page class="flex justify-center">
     <div class="work-area">
-<!--      <div class="manager-header">-->
-<!--        <div class="text-h3">-->
-<!--          受访者管理-->
-<!--        </div>-->
-<!--        <q-separator color="black"></q-separator>-->
-<!--      </div>-->
+      <!--      <div class="manager-header">-->
+      <!--        <div class="text-h3">-->
+      <!--          受访者管理-->
+      <!--        </div>-->
+      <!--        <q-separator color="black"></q-separator>-->
+      <!--      </div>-->
       <div class="q-pa-md">
         <q-table
           title="受访者列表"
@@ -41,6 +41,7 @@
               accept=".xls,.xlsx"
               max-files="1"
               bordered
+              :headers="[{name:'X-CSRFToken',value:token}]"
             />
           </q-card-section>
         </q-card>
@@ -53,6 +54,7 @@
 <script>
 import {URL_Prefix} from "src/utils/request";
 import {deleteRespondents, getRespondentList} from "src/api/respondent";
+import VueCookies from "vue-cookies";
 
 export default {
   name: "Respondents",
@@ -60,6 +62,7 @@ export default {
     return {
       selected: [],
       upload: false,
+      token: "",
       columns: [
         {
           name: 'id',
@@ -80,6 +83,9 @@ export default {
   },
   created() {
     this.getData()
+    if (this.$cookies.isKey('csrftoken')) {
+      this.token = this.$cookies.get('csrftoken');
+    }
   },
   methods: {
     getData() {
